@@ -57,6 +57,8 @@
   function init() {
     $$('[data-total-components]').forEach((element) => { element.textContent = components.length.toLocaleString("zh-CN"); });
     $$('[data-total-variants]').forEach((element) => { element.textContent = variants.length.toLocaleString("zh-CN"); });
+    $$('[data-total-fonts]').forEach((element) => { element.textContent = fontCatalog.total.toLocaleString("zh-CN"); });
+    $$('[data-total-chinese-fonts]').forEach((element) => { element.textContent = fontCatalog.chineseTotal.toLocaleString("zh-CN"); });
     els.search.value = state.query;
     els.offline.checked = state.offline;
     els.sort.value = state.sort;
@@ -122,6 +124,7 @@
     $("#closePetSetup").addEventListener("click", () => $("#petSetup").close());
     $("#petSetup").addEventListener("click", (event) => { if (event.target === $("#petSetup")) $("#petSetup").close(); });
     $("#fontSearch").addEventListener("input", (event) => renderFontOptions(event.target.value));
+    $("#fontScope").addEventListener("change", () => renderFontOptions($("#fontSearch").value));
     els.form.addEventListener("input", debounce((event) => { if (event.target.id !== "fontSearch") readFormAndPreview(); }, 80));
     els.form.addEventListener("change", readFormAndPreview);
     $("#copyUrl").addEventListener("click", copyUrl);
@@ -316,27 +319,46 @@
     const categoryLabels = { "Sans Serif": "黑体 / 无衬线", Serif: "衬线 / 宋体", Display: "艺术体", Handwriting: "手写体", Monospace: "等宽体" };
     const scriptLabels = { "chinese-simplified": "简体中文", "chinese-traditional": "繁体中文", japanese: "日文", korean: "韩文", arabic: "阿拉伯文", devanagari: "天城文", hebrew: "希伯来文", thai: "泰文", vietnamese: "越南文", cyrillic: "西里尔文", greek: "希腊文", tamil: "泰米尔文", bengali: "孟加拉文", ethiopic: "埃塞俄比亚文", khmer: "高棉文" };
     const needle = query.trim().toLowerCase();
+    const scope = $("#fontScope")?.value || "zh";
+    const chineseGoogle = (font) => font[2].some((script) => script.startsWith("chinese"));
     const systemMatches = fontCatalog.system.filter((font) => !needle || `${font[0]} ${font[1]} notion 默认 衬线 等宽`.toLowerCase().includes(needle));
+    const chineseMatches = (scope === "international" ? [] : fontCatalog.chinese).filter((font) => {
+      const haystack = [font.label, font.family, font.group, font.category, ...font.keywords, ...font.scripts, font.license, "中文 开源 可商用"].join(" ").toLowerCase();
+      return !needle || haystack.includes(needle);
+    });
     const googleMatches = fontCatalog.google.filter(([family, category, scripts]) => {
-      const haystack = [family, category, categoryLabels[category], ...scripts, ...scripts.map((script) => scriptLabels[script] || "")].join(" ").toLowerCase();
+      const isChinese = scripts.some((script) => script.startsWith("chinese"));
+      if (scope === "zh" && !isChinese) return false;
+      if (scope === "international" && isChinese) return false;
+      const haystack = [family, category, categoryLabels[category], ...scripts, ...scripts.map((script) => scriptLabels[script] || ""), "ofl 开源 可商用"].join(" ").toLowerCase();
       return !needle || haystack.includes(needle);
     });
     const systemMarkup = systemMatches.length ? `<optgroup label="Notion 内置字体">${systemMatches.map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join("")}</optgroup>` : "";
+    const chineseGroupOrder = ["中文黑体", "中文宋体 / 仿宋", "中文楷体", "中文手写字体", "中文艺术字体", "中文圆体", "中文像素字体", "中文等宽字体"];
+    const chineseMarkup = chineseGroupOrder.map((group) => {
+      const fonts = chineseMatches.filter((font) => font.group === group);
+      if (!fonts.length) return "";
+      return `<optgroup label="${group}">${fonts.map((font) => `<option value="${escapeHtml(font.id)}">${escapeHtml(font.label)} · ${escapeHtml(font.family)}</option>`).join("")}</optgroup>`;
+    }).join("");
     const groupOrder = ["Sans Serif", "Serif", "Display", "Handwriting", "Monospace"];
     const googleMarkup = groupOrder.map((category) => {
       const fonts = googleMatches.filter((font) => font[1] === category);
       if (!fonts.length) return "";
       return `<optgroup label="${categoryLabels[category]}">${fonts.map(([family, , scripts]) => { const language = scripts.map((script) => scriptLabels[script]).filter(Boolean).slice(0, 2).join(" / "); return `<option value="${escapeHtml(family)}">${escapeHtml(family)}${language ? ` · ${escapeHtml(language)}` : ""}</option>`; }).join("")}</optgroup>`;
     }).join("");
-    select.innerHTML = systemMarkup + googleMarkup;
+    select.innerHTML = systemMarkup + chineseMarkup + googleMarkup;
     const selected = state.config.font || "system";
     if (![...select.options].some((option) => option.value === selected)) {
+      const currentChinese = fontCatalog.chinese.find((font) => font.id === selected);
       const current = [...fontCatalog.system, ...fontCatalog.google].find((font) => font[0] === selected);
-      const currentLabel = fontCatalog.system.some((font) => font[0] === selected) ? current?.[1] : current?.[0];
+      const currentLabel = currentChinese?.label || (fontCatalog.system.some((font) => font[0] === selected) ? current?.[1] : current?.[0]);
       if (currentLabel) select.insertAdjacentHTML("afterbegin", `<option value="${escapeHtml(selected)}" hidden>${escapeHtml(currentLabel)} · 当前使用</option>`);
     }
     select.value = selected;
-    $("#fontFeedback").textContent = `${(systemMatches.length + googleMatches.length).toLocaleString("zh-CN")} / ${fontCatalog.total.toLocaleString("zh-CN")} 款 · Google Fonts 可商用`;
+    const visibleCount = chineseMatches.length + googleMatches.length;
+    const scopeTotal = scope === "zh" ? fontCatalog.chineseTotal : scope === "international" ? fontCatalog.google.filter((font) => !chineseGoogle(font)).length : fontCatalog.total - fontCatalog.system.length;
+    const scopeLabel = scope === "zh" ? "中文字体" : scope === "international" ? "国际字体" : "开源字体";
+    $("#fontFeedback").textContent = `${visibleCount.toLocaleString("zh-CN")} / ${scopeTotal.toLocaleString("zh-CN")} 款${scopeLabel} · 可商用`;
   }
 
   function writeConfigToForm() {

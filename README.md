@@ -50,7 +50,7 @@ Notion Widget Box 是我们为 Notion 用户提供的在线小组件服务。你
 <p align="center">
   <strong>85</strong> 个组件引擎&nbsp;&nbsp;·&nbsp;&nbsp;
   <strong>1,530</strong> 个主题与布局组合&nbsp;&nbsp;·&nbsp;&nbsp;
-  <strong>603</strong> 款字体&nbsp;&nbsp;·&nbsp;&nbsp;
+  <strong>633</strong> 款字体（53 款中文）&nbsp;&nbsp;·&nbsp;&nbsp;
   <strong>0</strong> 个用户部署步骤
 </p>
 
@@ -108,13 +108,13 @@ Notion Widget Box 是我们为 Notion 用户提供的在线小组件服务。你
 | 范围 | 可调内容 |
 | --- | --- |
 | 视觉 | 6 套主题、背景、卡片、文字、强调色、边框、阴影和透明外层 |
-| 字体 | Notion 默认、衬线、等宽预设，以及 600 款可商用 Google Fonts |
+| 字体 | 中文优先：黑体、宋体、仿宋、楷体、圆体、艺术、手写、像素和等宽字体；另有 500+ 款国际字体 |
 | 结构 | 紧凑、标准、宽幅，支持缩放、内边距、圆角和对齐方式 |
 | 本地化 | 语言、时区、地区、城市、日期和时间格式 |
 | 内容 | 标题、正文、图片、链接、音频、歌单、歌词、目标值和数据源 |
 | 动态 | 动画、速度、随机种子、交互状态、自动轮播和刷新行为 |
 
-Google Fonts 均为开源许可；字体服务不可用时，组件会自动回退到系统字体。
+字体选择器默认只展示 53 款中文字体，也可切换到“全部字体”或“国际字体”。新增的得意黑、思源黑体/宋体、霞鹜文楷、朱雀仿宋、小赖字体、寒蝉系列、方舟/缝合像素字体、更纱与 Maple Mono 等均已核验为 [SIL OFL 1.1](https://openfontlicense.org/)；WebFont 由 [ZSFT](https://fonts.zeoseven.com/) 按需加载。原有 Google Fonts 同样采用开源许可。字体服务不可用时，组件会自动回退到系统中文字体。
 
 ## 隐私与安全
 
@@ -169,7 +169,7 @@ python3 -m http.server 4173
 ├── assets/
 │   ├── service.js              # 官方托管服务地址
 │   ├── catalog.js              # 组件、主题和布局注册表
-│   ├── fonts.js                # 603 款字体目录
+│   ├── fonts.js                # 633 款字体目录（中文优先）
 │   ├── app.js                  # 搜索、筛选、收藏和定制器
 │   └── widget.js               # 组件引擎与交互
 ├── worker/                     # Cloudflare Worker 与 Durable Object

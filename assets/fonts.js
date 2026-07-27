@@ -6,6 +6,47 @@
     ["notion-serif", "衬线体 · Notion Serif", "Georgia, \"Songti SC\", \"STSong\", serif"],
     ["notion-mono", "等宽体 · Notion Mono", "ui-monospace, \"SFMono-Regular\", Menlo, Consolas, monospace"]
   ];
+  // 中文字体优先目录。所有条目均通过字体项目或 ZSFT 条目页核验为 SIL OFL 1.1，
+  // WebFont 由 ZSFT 按需提供，避免把体积很大的 CJK 字体文件打包进 GitHub Pages。
+  const chinese = [
+    { id: "zh-source-han-sans", family: "Noto Sans CJK", label: "思源黑体", group: "中文黑体", category: "Sans Serif", cssUrl: "https://fontsapi.zeoseven.com/69/main/result.css", keywords: ["黑体", "无衬线", "现代", "简体", "繁体"] },
+    { id: "zh-lxgw-975-hei", family: "LXGW 975 Hei SC 400W", label: "霞鹜 975 黑体", group: "中文黑体", category: "Sans Serif", cssUrl: "https://fontsapi.zeoseven.com/185/main/result.css", keywords: ["黑体", "正文", "简体"] },
+    { id: "zh-wenyuan-sans", family: "WenYuan Sans SC Flex VF", label: "文渊黑体 SC", group: "中文黑体", category: "Sans Serif", cssUrl: "https://fontsapi.zeoseven.com/13/main/result.css", keywords: ["黑体", "可变字体", "正文", "简体"] },
+    { id: "zh-zhiyi-hei", family: "致一黑體_傳承形", label: "致一黑体·传承形", group: "中文黑体", category: "Sans Serif", cssUrl: "https://fontsapi.zeoseven.com/834/main/result.css", keywords: ["黑体", "传承字形", "繁体"] },
+
+    { id: "zh-source-han-serif", family: "Noto Serif CJK", label: "思源宋体", group: "中文宋体 / 仿宋", category: "Serif", cssUrl: "https://fontsapi.zeoseven.com/285/main/result.css", keywords: ["宋体", "衬线", "正文", "简体", "繁体"] },
+    { id: "zh-zhuque-fangsong", family: "Zhuque Fangsong (technical preview)", label: "朱雀仿宋", group: "中文宋体 / 仿宋", category: "Serif", cssUrl: "https://fontsapi.zeoseven.com/7/main/result.css", keywords: ["仿宋", "衬线", "正文", "古典"] },
+    { id: "zh-chill-huosong", family: "ChillHuoSong_F", label: "寒蝉活宋体", group: "中文宋体 / 仿宋", category: "Serif", cssUrl: "https://fontsapi.zeoseven.com/875/main/result.css", keywords: ["宋体", "复古", "活字", "繁体"] },
+    { id: "zh-chill-huofangsong", family: "ChillHuoFangSong", label: "寒蝉活仿宋", group: "中文宋体 / 仿宋", category: "Serif", cssUrl: "https://fontsapi.zeoseven.com/871/main/result.css", keywords: ["仿宋", "复古", "活字"] },
+
+    { id: "zh-lxgw-wenkai", family: "LXGW WenKai", label: "霞鹜文楷", group: "中文楷体", category: "Serif", cssUrl: "https://fontsapi.zeoseven.com/292/main/result.css", keywords: ["楷体", "正文", "阅读", "简体", "繁体"] },
+    { id: "zh-lxgw-zhenkai", family: "LXGW ZhenKai GB", label: "霞鹜臻楷", group: "中文楷体", category: "Serif", cssUrl: "https://fontsapi.zeoseven.com/2/main/result.css", keywords: ["楷体", "粗楷", "标题", "简体"] },
+    { id: "zh-chill-kai", family: "ChillKai", label: "寒蝉正楷体", group: "中文楷体", category: "Serif", cssUrl: "https://fontsapi.zeoseven.com/5/main/result.css", keywords: ["楷体", "古典", "书法"] },
+    { id: "zh-chill-huokai", family: "ChillHuoKai", label: "寒蝉活楷体", group: "中文楷体", category: "Serif", cssUrl: "https://fontsapi.zeoseven.com/874/main/result.css", keywords: ["楷体", "复古", "活字"] },
+    { id: "zh-chill-huofangkai", family: "ChillHuoFangKai_F", label: "寒蝉活仿楷", group: "中文楷体", category: "Serif", cssUrl: "https://fontsapi.zeoseven.com/872/main/result.css", keywords: ["仿楷", "楷体", "复古"] },
+
+    { id: "zh-xiaolai", family: "Xiaolai", label: "小赖字体", group: "中文手写字体", category: "Handwriting", cssUrl: "https://fontsapi.zeoseven.com/281/main/result.css", keywords: ["手写", "可爱", "日记", "简体", "繁体"] },
+    { id: "zh-yozai", family: "Yozai", label: "悠哉字体", group: "中文手写字体", category: "Handwriting", cssUrl: "https://fontsapi.zeoseven.com/192/main/result.css", keywords: ["手写", "轻松", "日记", "可爱"] },
+    { id: "zh-lxgw-marker", family: "LXGW Marker Gothic", label: "霞鹜漫黑", group: "中文手写字体", category: "Handwriting", cssUrl: "https://fontsapi.zeoseven.com/134/main/result.css", keywords: ["手写", "马克笔", "标题", "海报"] },
+
+    { id: "zh-smiley-sans", family: "Smiley Sans Oblique", label: "得意黑", group: "中文艺术字体", category: "Display", cssUrl: "https://fontsapi.zeoseven.com/92/main/result.css", keywords: ["艺术", "黑体", "窄斜体", "标题", "海报"] },
+    { id: "zh-chill-jinshusong", family: "寒蝉锦书宋Pro", label: "寒蝉锦书宋 Pro", group: "中文艺术字体", category: "Display", cssUrl: "https://fontsapi.zeoseven.com/2246/main/result.css", keywords: ["艺术", "宋体", "圆润", "标题"] },
+    { id: "zh-chill-duanheisong", family: "寒蝉端黑宋Pro", label: "寒蝉端黑宋 Pro", group: "中文艺术字体", category: "Display", cssUrl: "https://fontsapi.zeoseven.com/366/main/result.css", keywords: ["艺术", "黑宋", "标题", "海报"] },
+    { id: "zh-chill-zhuokai", family: "寒蝉拙楷体 R", label: "寒蝉拙楷体", group: "中文艺术字体", category: "Display", cssUrl: "https://fontsapi.zeoseven.com/2239/main/result.css", keywords: ["艺术", "楷体", "稚拙", "标题"] },
+
+    { id: "zh-sarasa-ji", family: "Sarasa Ji Gothic SC", label: "更纱圆纪黑体", group: "中文圆体", category: "Sans Serif", cssUrl: "https://fontsapi.zeoseven.com/617/main/result.css", keywords: ["圆体", "黑体", "可爱", "简体"] },
+
+    { id: "zh-fusion-pixel", family: "Fusion Pixel 12px Mono latin", label: "缝合像素字体", group: "中文像素字体", category: "Display", cssUrl: "https://fontsapi.zeoseven.com/570/main/result.css", keywords: ["像素", "点阵", "复古", "游戏"] },
+    { id: "zh-ark-pixel", family: "Ark Pixel 12px Prop latin", label: "方舟像素字体", group: "中文像素字体", category: "Display", cssUrl: "https://fontsapi.zeoseven.com/925/main/result.css", keywords: ["像素", "点阵", "复古", "游戏"] },
+    { id: "zh-muzai-pixel", family: "MuzaiPixel", label: "目哉像素", group: "中文像素字体", category: "Display", cssUrl: "https://fontsapi.zeoseven.com/108/main/result.css", keywords: ["像素", "点阵", "标题", "游戏"] },
+    { id: "zh-uwu-matrix", family: "UwU Matrix 16U", label: "UwU 点矩黑", group: "中文像素字体", category: "Display", cssUrl: "https://fontsapi.zeoseven.com/992/main/result.css", keywords: ["像素", "点阵", "黑体", "可爱"] },
+
+    { id: "zh-lxgw-wenkai-mono", family: "LXGW WenKai Mono", label: "霞鹜文楷 Mono", group: "中文等宽字体", category: "Monospace", cssUrl: "https://fontsapi.zeoseven.com/293/main/result.css", keywords: ["等宽", "楷体", "代码", "简体", "繁体"] },
+    { id: "zh-xiaolai-mono", family: "Xiaolai Mono", label: "小赖字体 Mono", group: "中文等宽字体", category: "Monospace", cssUrl: "https://fontsapi.zeoseven.com/282/main/result.css", keywords: ["等宽", "手写", "代码", "可爱"] },
+    { id: "zh-maple-mono", family: "Maple Mono NF CN", label: "Maple Mono NF-CN", group: "中文等宽字体", category: "Monospace", cssUrl: "https://fontsapi.zeoseven.com/442/main/result.css", keywords: ["等宽", "圆体", "代码", "连字"] },
+    { id: "zh-jetbrains-maple", family: "JetBrains Maple Mono", label: "JetBrains Maple Mono", group: "中文等宽字体", category: "Monospace", cssUrl: "https://fontsapi.zeoseven.com/521/main/result.css", keywords: ["等宽", "代码", "圆体", "连字"] },
+    { id: "zh-sarasa-mono", family: "Sarasa Mono SC", label: "更纱黑体 Mono", group: "中文等宽字体", category: "Monospace", cssUrl: "https://fontsapi.zeoseven.com/159/main/result.css", keywords: ["等宽", "黑体", "代码", "简体"] }
+  ].map((font) => ({ ...font, scripts: ["chinese-simplified", "chinese-traditional"], license: "OFL-1.1", provider: "ZSFT" }));
   const google = [
   [
     "Google Sans",
@@ -6222,9 +6263,10 @@
 
   window.WIDGET_FONTS = {
     system,
+    chinese,
     google,
-    total: system.length + google.length,
-    licenseLabel: "Google Fonts 开源字体 · 可商用"
+    total: system.length + chinese.length + google.length,
+    chineseTotal: chinese.length + google.filter((font) => font[2].some((script) => script.startsWith("chinese"))).length,
+    licenseLabel: "开源 / 可商用字体"
   };
 })();
-

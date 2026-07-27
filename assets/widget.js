@@ -24,6 +24,22 @@
       document.documentElement.style.setProperty("--widget-font", systemFont[2]);
       return;
     }
+    const chineseFont = fontCatalog?.chinese?.find((font) => font.id === requested);
+    if (chineseFont) {
+      const cleanFamily = chineseFont.family.replace(/["\\]/g, "");
+      const fallback = chineseFont.category === "Monospace"
+        ? 'ui-monospace, "SFMono-Regular", monospace'
+        : chineseFont.category === "Serif"
+          ? '"Songti SC", STSong, serif'
+          : '"PingFang SC", "Microsoft YaHei", sans-serif';
+      document.documentElement.style.setProperty("--widget-font", `"${cleanFamily}", ${fallback}`);
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = chineseFont.cssUrl;
+      link.crossOrigin = "anonymous";
+      document.head.appendChild(link);
+      return;
+    }
     const googleFont = fontCatalog?.google.find((font) => font[0] === requested);
     if (!googleFont) return;
     const family = googleFont[0];
