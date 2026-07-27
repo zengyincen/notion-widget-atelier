@@ -17,8 +17,10 @@
   const variants = components.flatMap((component, componentIndex) => themes.flatMap((theme) => layouts.map((layout) => ({
     id: `${component.id}--${theme.id}--${layout.id}`,
     component, theme, layout, componentIndex,
-    search: [component.title, component.description, component.id, categoryMap[component.category].label, theme.label, theme.short, layout.label, ...component.tags].join(" ").toLowerCase()
+    search: [component.title, component.description, component.id, categoryMap[component.category].label, ...component.tags].join(" ").toLowerCase()
   }))));
+  const variantMap = Object.fromEntries(variants.map((item) => [item.id, item]));
+  const storedFavorites = readJSON("widgetBox.favorites", []).map((id) => variantMap[id]?.component.id || id).filter((id) => components.some((component) => component.id === id));
 
   const initialUrl = new URL(location.href);
   const state = {
@@ -31,7 +33,7 @@
     sort: initialUrl.searchParams.get("sort") || "recommended",
     shown: 24,
     view: "grid",
-    favorites: new Set(readJSON("widgetBox.favorites", [])),
+    favorites: new Set(storedFavorites),
     selected: null,
     config: {}, pendingVariant: null, petNeedsAdoption: false
   };
@@ -61,22 +63,23 @@
     renderFilterControls();
     bindEvents();
     render();
+    localStorage.setItem("widgetBox.favorites", JSON.stringify([...state.favorites]));
     tickHeroClock();
     setInterval(tickHeroClock, 1000);
     const direct = initialUrl.searchParams.get("edit");
     if (direct) {
-      const match = variants.find((item) => item.id === direct);
+      const match = variantMap[direct];
       if (match) openCustomizer(match);
     }
   }
 
   function renderFilterControls() {
     els.categoryFilters.innerHTML = displayCategories.map((category) => {
-      const count = category.id === "all" ? variants.length : components.filter((item) => category.componentIds ? category.componentIds.includes(item.id) : item.category === category.id).length * themes.length * layouts.length;
+      const count = category.id === "all" ? components.length : components.filter((item) => category.componentIds ? category.componentIds.includes(item.id) : item.category === category.id).length;
       return `<button class="filter-option ${category.featured ? "is-feature" : ""} ${state.category === category.id ? "is-active" : ""}" data-filter-category="${category.id}" type="button"><i>${category.icon}</i><span>${category.label}</span><b>${count}</b></button>`;
     }).join("");
-    els.themeFilters.innerHTML = `<button class="filter-option ${state.theme === "all" ? "is-active" : ""}" data-filter-theme="all" type="button"><i style="--dot:linear-gradient(135deg,#ff8a65,#4f8cff)"></i><span>全部风格</span><b>${variants.length}</b></button>` + themes.map((theme) => `<button class="filter-option ${state.theme === theme.id ? "is-active" : ""}" data-filter-theme="${theme.id}" type="button"><i style="--dot:${theme.accent}"></i><span>${theme.short}</span><b>${components.length * layouts.length}</b></button>`).join("");
-    els.layoutFilters.innerHTML = `<button class="filter-option ${state.layout === "all" ? "is-active" : ""}" data-filter-layout="all" type="button"><i>◇</i><span>全部尺寸</span><b>${variants.length}</b></button>` + layouts.map((layout) => `<button class="filter-option ${state.layout === layout.id ? "is-active" : ""}" data-filter-layout="${layout.id}" type="button"><i>${layout.id === "compact" ? "▬" : layout.id === "standard" ? "□" : "▭"}</i><span>${layout.label}</span><b>${components.length * themes.length}</b></button>`).join("");
+    els.themeFilters.innerHTML = `<button class="filter-option ${state.theme === "all" ? "is-active" : ""}" data-filter-theme="all" type="button"><i style="--dot:linear-gradient(135deg,#ff8a65,#4f8cff)"></i><span>默认风格</span><b>${components.length}</b></button>` + themes.map((theme) => `<button class="filter-option ${state.theme === theme.id ? "is-active" : ""}" data-filter-theme="${theme.id}" type="button"><i style="--dot:${theme.accent}"></i><span>${theme.short}</span><b>${components.length}</b></button>`).join("");
+    els.layoutFilters.innerHTML = `<button class="filter-option ${state.layout === "all" ? "is-active" : ""}" data-filter-layout="all" type="button"><i>◇</i><span>默认尺寸</span><b>${components.length}</b></button>` + layouts.map((layout) => `<button class="filter-option ${state.layout === layout.id ? "is-active" : ""}" data-filter-layout="${layout.id}" type="button"><i>${layout.id === "compact" ? "▬" : layout.id === "standard" ? "□" : "▭"}</i><span>${layout.label}</span><b>${components.length}</b></button>`).join("");
   }
 
   function bindEvents() {
@@ -104,7 +107,7 @@
       if (quick) setFilter("quick", quick.dataset.quick);
       if (view) { state.view = view.dataset.view; $$("[data-view]").forEach((b) => b.classList.toggle("is-active", b === view)); els.grid.classList.toggle("list-view", state.view === "list"); }
       if (favorite) { event.stopPropagation(); toggleFavorite(favorite.dataset.favorite); }
-      if (cardAction && !favorite) { const variant = variants.find((item) => item.id === cardAction.dataset.customize); if (variant) openCustomizer(variant); }
+      if (cardAction && !favorite) { const variant = variantMap[cardAction.dataset.customize]; if (variant) openCustomizer(variant); }
       if (previewSize && els.dialog.open) setPreviewSize(previewSize.dataset.size);
       if (preset && els.dialog.open) applyTheme(preset.dataset.preset);
       if (event.target.closest("[data-close]")) els.dialog.close();
@@ -114,7 +117,7 @@
     els.offline.addEventListener("change", () => { state.offline = els.offline.checked; state.shown = 24; render(); });
     els.sort.addEventListener("change", () => { state.sort = els.sort.value; render(); });
     els.loadMore.addEventListener("click", () => { state.shown += 24; render(); });
-    $("#surpriseButton").addEventListener("click", () => openCustomizer(variants[Math.floor(Math.random() * variants.length)]));
+    $("#surpriseButton").addEventListener("click", () => openCustomizer(catalogVariant(components[Math.floor(Math.random() * components.length)])));
     $("#petSetupForm").addEventListener("submit", createPetProfile);
     $("#closePetSetup").addEventListener("click", () => $("#petSetup").close());
     $("#petSetup").addEventListener("click", (event) => { if (event.target === $("#petSetup")) $("#petSetup").close(); });
@@ -141,6 +144,11 @@
   }
 
   function setFilter(key, value) { state[key] = value; state.shown = 24; renderFilterControls(); render(); }
+  function catalogVariant(component) {
+    const themeId = state.theme === "all" ? (themeMap.notion ? "notion" : themes[0].id) : state.theme;
+    const layoutId = state.layout === "all" ? (layoutMap.standard ? "standard" : layouts[0].id) : state.layout;
+    return variantMap[`${component.id}--${themeId}--${layoutId}`] || variants.find((item) => item.component.id === component.id);
+  }
   function resetFilters() {
     Object.assign(state, { query: "", category: "all", theme: "all", layout: "all", quick: "all", offline: false, shown: 24 });
     els.search.value = ""; els.offline.checked = false; renderFilterControls(); render();
@@ -148,25 +156,23 @@
 
   function getFiltered() {
     const words = state.query.toLowerCase().split(/\s+/).filter(Boolean);
-    let result = variants.filter((item) => {
+    let result = components.map(catalogVariant).filter((item) => {
       if (state.category !== "all") {
         const selectedCategory = categoryMap[state.category];
         if (selectedCategory?.componentIds ? !selectedCategory.componentIds.includes(item.component.id) : item.component.category !== state.category) return false;
       }
-      if (state.theme !== "all" && item.theme.id !== state.theme) return false;
-      if (state.layout !== "all" && item.layout.id !== state.layout) return false;
       if (state.offline && item.component.online) return false;
       if (words.some((word) => !item.search.includes(word))) return false;
       if (state.quick === "popular" && !item.component.popular) return false;
       if (state.quick === "new" && !item.component.isNew) return false;
       if (state.quick === "productivity" && !["focus", "data", "time"].includes(item.component.category)) return false;
-      if (state.quick === "aesthetic" && !["glass", "blush", "sage"].includes(item.theme.id)) return false;
+      if (state.quick === "aesthetic" && !["media", "life", "info"].includes(item.component.category) && !item.component.tags.some((tag) => ["art", "艺术", "氛围", "photo"].includes(tag))) return false;
       if (state.quick === "interactive" && !item.component.interactive) return false;
-      if (state.quick === "favorites" && !state.favorites.has(item.id)) return false;
+      if (state.quick === "favorites" && !state.favorites.has(item.component.id)) return false;
       return true;
     });
     result.sort((a, b) => {
-      if (state.sort === "name") return a.component.title.localeCompare(b.component.title, "zh-CN") || a.theme.label.localeCompare(b.theme.label);
+      if (state.sort === "name") return a.component.title.localeCompare(b.component.title, "zh-CN");
       if (state.sort === "category") return a.component.category.localeCompare(b.component.category) || a.componentIndex - b.componentIndex;
       if (state.sort === "newest") return Number(b.component.isNew) - Number(a.component.isNew) || b.component.added - a.component.added;
       return Number(b.component.popular) - Number(a.component.popular) || Number(b.component.isNew) - Number(a.component.isNew) || a.componentIndex - b.componentIndex;
@@ -178,7 +184,7 @@
     const filtered = getFiltered();
     const visible = filtered.slice(0, state.shown);
     els.resultCount.textContent = filtered.length.toLocaleString("zh-CN");
-    els.searchFeedback.textContent = state.query ? `找到 ${filtered.length.toLocaleString("zh-CN")} 款` : `${filtered.length.toLocaleString("zh-CN")} 款`;
+    els.searchFeedback.textContent = state.query ? `找到 ${filtered.length.toLocaleString("zh-CN")} 个` : `${filtered.length.toLocaleString("zh-CN")} 个组件`;
     els.searchFeedback.classList.toggle("is-empty", filtered.length === 0);
     els.grid.innerHTML = visible.map(cardTemplate).join("");
     els.grid.classList.toggle("list-view", state.view === "list");
@@ -188,23 +194,23 @@
     els.loadMore.hidden = filtered.length === 0;
     els.loadMore.disabled = remaining === 0;
     els.loadMore.firstChild.textContent = remaining ? "加载更多 " : "已显示全部 ";
-    els.remaining.textContent = remaining ? `(${remaining.toLocaleString("zh-CN")} 款)` : "";
+    els.remaining.textContent = remaining ? `(${remaining.toLocaleString("zh-CN")} 个)` : "";
     $$("[data-quick]").forEach((button) => button.classList.toggle("is-active", button.dataset.quick === state.quick));
     renderActiveFilters();
     syncUrl();
   }
 
   function cardTemplate(item) {
-    const { component, theme, layout } = item;
+    const { component, theme } = item;
     const category = categoryMap[component.category];
-    const isFavorite = state.favorites.has(item.id);
-    return `<article class="widget-card theme-${theme.id} layout-${layout.id}" data-customize="${item.id}" style="--card-bg:${theme.bg};--card-surface:${theme.surface};--card-text:${theme.text};--card-accent:${theme.accent}">
+    const isFavorite = state.favorites.has(component.id);
+    return `<article class="widget-card" data-customize="${item.id}" style="--card-accent:${theme.accent}">
       <div class="card-preview">
         <div class="card-badges">${component.isNew ? '<span class="new">NEW</span>' : ""}${component.popular ? '<span>POPULAR</span>' : ""}${component.online ? '<span>LIVE</span>' : '<span>LOCAL</span>'}</div>
-        <button class="favorite-button ${isFavorite ? "is-active" : ""}" data-favorite="${item.id}" type="button" aria-label="${isFavorite ? "取消收藏" : "收藏"}">${isFavorite ? "♥" : "♡"}</button>
-        <div class="preview-glyph"><i>${component.icon}</i><strong>${escapeHtml(component.title)}</strong><small>${theme.short} · ${layout.label}</small></div>
+        <button class="favorite-button ${isFavorite ? "is-active" : ""}" data-favorite="${component.id}" type="button" aria-label="${isFavorite ? "取消收藏" : "收藏"}">${isFavorite ? "♥" : "♡"}</button>
+        <div class="preview-glyph"><i>${component.icon}</i><strong>${escapeHtml(component.title)}</strong><small>${escapeHtml(category.label)}</small></div>
       </div>
-      <div class="card-body"><div class="card-meta"><span>${category.label}</span><i title="${component.online ? "需要联网" : "离线可用"}"></i></div><h3>${escapeHtml(component.title)} · ${theme.short}</h3><p>${escapeHtml(component.description)}</p><div class="card-footer"><span>${layout.label} · 可自定义</span><button type="button">预览并定制 →</button></div></div>
+      <div class="card-body"><div class="card-meta"><span>${category.label}</span><i title="${component.online ? "需要联网" : "离线可用"}"></i></div><h3>${escapeHtml(component.title)}</h3><p>${escapeHtml(component.description)}</p><div class="card-footer"><span>主题 · 尺寸 · 字体可调</span><button type="button">预览并定制 →</button></div></div>
     </article>`;
   }
 
