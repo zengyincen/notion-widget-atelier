@@ -64,7 +64,6 @@ kbd { border: 1px solid #dddcd7; border-bottom-width: 2px; background: #fafafa; 
 .demo-clock { width: 330px; height: 215px; left: 8%; top: 130px; padding: 28px 32px; transform: rotate(-5deg); background: rgba(247,246,242,.82); }
 .demo-clock small { color: #9a8178; letter-spacing: .12em; font-size: 8px; }.demo-clock strong { display: block; font-size: 67px; line-height: 1.1; letter-spacing: -.07em; font-variant-numeric: tabular-nums; }.demo-clock span { font-family: Georgia, serif; font-style: italic; color: #777; }
 .demo-progress { width: 300px; height: 150px; right: 13%; bottom: 5px; padding: 25px; transform: rotate(2deg); }.demo-progress span { font-size: 10px; color: #777; }.demo-progress strong { float: right; font-size: 15px; }.demo-progress i { margin: 15px 0 13px; display: block; height: 6px; border-radius: 6px; background: #e9e7e2; overflow: hidden; }.demo-progress i b { display: block; width: 72%; height: 100%; border-radius: inherit; background: #6c91e7; }.demo-progress small { color: #777; font-family: Georgia, serif; font-style: italic; }
-.floating-chip { position: absolute; left: 45%; top: 70px; z-index: 2; padding: 9px 13px; border-radius: 999px; background: #20201e; color: white; font-size: 9px; font-weight: 700; box-shadow: 0 8px 20px rgba(0,0,0,.2); transform: rotate(6deg); }
 
 .library { max-width: 1640px; margin: 0 auto; padding: 72px 34px 90px; display: grid; grid-template-columns: 212px minmax(0, 1fr); gap: 46px; }
 .filter-panel { align-self: start; position: sticky; top: 94px; }
