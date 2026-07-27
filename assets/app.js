@@ -104,7 +104,7 @@
       if (quick) setFilter("quick", quick.dataset.quick);
       if (view) { state.view = view.dataset.view; $$("[data-view]").forEach((b) => b.classList.toggle("is-active", b === view)); els.grid.classList.toggle("list-view", state.view === "list"); }
       if (favorite) { event.stopPropagation(); toggleFavorite(favorite.dataset.favorite); }
-      if (cardAction) { const variant = variants.find((item) => item.id === cardAction.dataset.customize); if (variant) openCustomizer(variant); }
+      if (cardAction && !favorite) { const variant = variants.find((item) => item.id === cardAction.dataset.customize); if (variant) openCustomizer(variant); }
       if (previewSize && els.dialog.open) setPreviewSize(previewSize.dataset.size);
       if (preset && els.dialog.open) applyTheme(preset.dataset.preset);
       if (event.target.closest("[data-close]")) els.dialog.close();
@@ -198,13 +198,13 @@
     const { component, theme, layout } = item;
     const category = categoryMap[component.category];
     const isFavorite = state.favorites.has(item.id);
-    return `<article class="widget-card theme-${theme.id} layout-${layout.id}" style="--card-bg:${theme.bg};--card-surface:${theme.surface};--card-text:${theme.text};--card-accent:${theme.accent}">
+    return `<article class="widget-card theme-${theme.id} layout-${layout.id}" data-customize="${item.id}" style="--card-bg:${theme.bg};--card-surface:${theme.surface};--card-text:${theme.text};--card-accent:${theme.accent}">
       <div class="card-preview">
         <div class="card-badges">${component.isNew ? '<span class="new">NEW</span>' : ""}${component.popular ? '<span>POPULAR</span>' : ""}${component.online ? '<span>LIVE</span>' : '<span>LOCAL</span>'}</div>
         <button class="favorite-button ${isFavorite ? "is-active" : ""}" data-favorite="${item.id}" type="button" aria-label="${isFavorite ? "取消收藏" : "收藏"}">${isFavorite ? "♥" : "♡"}</button>
         <div class="preview-glyph"><i>${component.icon}</i><strong>${escapeHtml(component.title)}</strong><small>${theme.short} · ${layout.label}</small></div>
       </div>
-      <div class="card-body"><div class="card-meta"><span>${category.label}</span><i title="${component.online ? "需要联网" : "离线可用"}"></i></div><h3>${escapeHtml(component.title)} · ${theme.short}</h3><p>${escapeHtml(component.description)}</p><div class="card-footer"><span>${layout.label} · 可自定义</span><button type="button" data-customize="${item.id}">预览并定制 →</button></div></div>
+      <div class="card-body"><div class="card-meta"><span>${category.label}</span><i title="${component.online ? "需要联网" : "离线可用"}"></i></div><h3>${escapeHtml(component.title)} · ${theme.short}</h3><p>${escapeHtml(component.description)}</p><div class="card-footer"><span>${layout.label} · 可自定义</span><button type="button">预览并定制 →</button></div></div>
     </article>`;
   }
 
