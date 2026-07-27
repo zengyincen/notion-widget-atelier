@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "notion-widget-box-sync",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-27",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "durable_objects": {
+    "bindings": [
+      { "name": "PETS", "class_name": "PetState" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["PetState"] }
+  ]
+}

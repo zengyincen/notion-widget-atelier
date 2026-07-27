@@ -1,0 +1,154 @@
+name: Pet interaction
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pet-state-updates
+  cancel-in-progress: false
+
+jobs:
+  update-pet:
+    if: contains(github.event.issue.body, 'notion-widget-box-pet-action')
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate, merge and update pet state
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const crypto = require('crypto');
+            const { owner, repo } = context.repo;
+            const issue = context.payload.issue;
+            const match = issue.title.match(/^\[pet:([a-zA-Z0-9_-]{1,64}):r(\d+)\]\s+(feed|water|pet)$/);
+
+            async function comment(number, body) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: number, body });
+            }
+            async function close(number) {
+              await github.rest.issues.update({ owner, repo, issue_number: number, state: 'closed' });
+            }
+
+            if (!match) {
+              await comment(issue.number, '未识别的宠物动作格式，本次请求未执行。');
+              await close(issue.number);
+              return;
+            }
+
+            const [, petId, revisionText, action] = match;
+            const requestedRevision = Number(revisionText);
+            const path = `data/pets/${petId}.json`;
+            const now = Date.now();
+            const defaults = {
+              petId, food: 28, water: 24, love: 45, updated: now,
+              lastPetAt: 0, revision: 0, limits: {}
+            };
+
+            let state = { ...defaults };
+            let sha;
+            try {
+              const current = await github.rest.repos.getContent({ owner, repo, path });
+              if (!Array.isArray(current.data) && current.data.type === 'file') {
+                sha = current.data.sha;
+                state = { ...defaults, ...JSON.parse(Buffer.from(current.data.content, 'base64').toString('utf8')) };
+              }
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+
+            const hours = Math.max(0, (now - Number(state.updated || now)) / 3600000);
+            state.food = Math.max(0, Number(state.food) - hours * 3.2);
+            state.water = Math.max(0, Number(state.water) - hours * 4.2);
+            state.love = Math.max(0, Number(state.love) - hours * 1.7);
+            state.updated = now;
+            state.limits ||= {};
+
+            const actorHash = crypto.createHash('sha256').update(context.actor.toLowerCase()).digest('hex').slice(0, 16);
+            const actorLimits = state.limits[actorHash] || { feed: 0, water: 0 };
+            const twoHours = 2 * 60 * 60 * 1000;
+            let accepted = true;
+            let reason = '';
+
+            if (requestedRevision !== Number(state.revision || 0)) {
+              accepted = false;
+              reason = '这个动作链接已经使用过或状态已经更新。请返回 Notion，等待组件刷新后再操作。';
+            } else if ((action === 'feed' || action === 'water') && now - Number(actorLimits[action] || 0) < twoHours) {
+              accepted = false;
+              const minutes = Math.ceil((twoHours - (now - Number(actorLimits[action]))) / 60000);
+              reason = `同一用户 2 小时内只能${action === 'feed' ? '喂食' : '喂水'}一次，请约 ${minutes} 分钟后再来。`;
+            }
+
+            if (accepted) {
+              if (action === 'feed') {
+                state.food = Math.min(100, state.food + 34);
+                actorLimits.feed = now;
+              } else if (action === 'water') {
+                state.water = Math.min(100, state.water + 40);
+                actorLimits.water = now;
+              } else {
+                state.love = Math.min(100, state.love + 12);
+                state.lastPetAt = now;
+              }
+              state.limits[actorHash] = actorLimits;
+              state.revision = Number(state.revision || 0) + 1;
+              state.lastAction = action;
+              state.lastActor = actorHash;
+
+              const content = Buffer.from(`${JSON.stringify(state, null, 2)}\n`).toString('base64');
+              await github.rest.repos.createOrUpdateFileContents({
+                owner, repo, path, sha,
+                message: `pet(${petId}): ${action} via @${context.actor}`,
+                content,
+                branch: context.payload.repository.default_branch,
+              });
+            }
+
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: 'pet-action' });
+            } catch {
+              await github.rest.issues.createLabel({ owner, repo, name: 'pet-action', color: 'ff8a65', description: 'Notion Atelier pet interaction' });
+            }
+            await github.rest.issues.addLabels({ owner, repo, issue_number: issue.number, labels: ['pet-action'] });
+
+            const all = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, creator: context.actor, state: 'all', labels: 'pet-action', per_page: 100,
+            });
+            const samePet = all.filter(item => !item.pull_request && item.title.startsWith(`[pet:${petId}:`)).sort((a, b) => a.number - b.number);
+            const canonical = samePet[0] || issue;
+            const actionName = { feed: '喂食', water: '喂水', pet: '抚摸' }[action];
+            const status = accepted
+              ? `✅ 已${actionName}。当前状态：饱腹 ${Math.round(state.food)}%、水分 ${Math.round(state.water)}%、安心 ${Math.round(state.love)}%。状态版本已更新为 r${state.revision}。`
+              : `⏳ 本次${actionName}未重复计入：${reason}`;
+
+            if (canonical.number !== issue.number) {
+              await comment(canonical.number, `${status}\n\n来自重复请求 #${issue.number}，已自动合并。`);
+              await comment(issue.number, `此请求已合并到你的第一条宠物记录 #${canonical.number}。\n\n${status}`);
+            } else {
+              await comment(issue.number, status);
+            }
+            await close(issue.number);
+
+      - name: Wait for committed state
+        run: sleep 3
+
+      - name: Check out latest default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Deploy updated pet state
+        id: deployment
+        uses: actions/deploy-pages@v4

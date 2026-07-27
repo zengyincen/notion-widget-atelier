@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>连接公开 Notion 数据库 — Notion Widget Box</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <style>
+      :root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC",sans-serif;color:#20201e;background:#efeee9;--line:rgba(32,32,30,.1);--accent:#ff7b58}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 75% 5%,#fff 0,transparent 28%),#efeee9}.top{height:64px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#f7f6f2cc;backdrop-filter:blur(20px)}.brand{font-weight:750;font-size:14px}.top a{font-size:11px;color:#777;text-decoration:none}.wrap{width:min(1040px,calc(100% - 30px));margin:45px auto;display:grid;grid-template-columns:.9fr 1.1fr;gap:25px}.intro,.panel{border:1px solid var(--line);border-radius:26px;background:#f9f8f4;box-shadow:0 20px 60px rgba(30,30,25,.08)}.intro{padding:42px;align-self:start}.eyebrow{font-size:8px;letter-spacing:.16em;font-weight:800;color:#999}.intro h1{font-size:42px;line-height:1.02;letter-spacing:-.055em;margin:14px 0 20px}.intro h1 em{font-family:Georgia,serif;font-weight:400;color:#8a8882}.intro p{font-size:12px;line-height:1.8;color:#777}.steps{margin-top:28px;display:grid;gap:14px}.step{display:grid;grid-template-columns:27px 1fr;gap:10px;align-items:start;font-size:10px;color:#666}.step i{width:27px;height:27px;border-radius:9px;background:#20201e;color:white;display:grid;place-items:center;font-style:normal;font-weight:700}.step b{display:block;color:#20201e;margin-bottom:3px}.notice{margin-top:25px;padding:13px;border-radius:12px;background:#fff3e9;color:#9b5c34;font-size:9px;line-height:1.6}.panel{padding:30px}.panel h2{margin:0 0 5px;font-size:20px}.panel>p{margin:0 0 24px;font-size:10px;color:#888}.field{display:grid;gap:7px;margin-bottom:14px;font-size:9px;color:#777}.field input,.field select{width:100%;border:1px solid var(--line);border-radius:11px;background:white;padding:10px 11px;outline:0;font-size:11px}.field input:focus,.field select:focus{border-color:#7997e6;box-shadow:0 0 0 3px #7899ee1a}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.button{width:100%;min-height:43px;border:0;border-radius:12px;background:#20201e;color:white;font-weight:750;font-size:11px}.button.secondary{background:white;color:#20201e;border:1px solid var(--line)}.status{margin:15px 0;padding:12px;border-radius:11px;background:#efeee9;font-size:9px;color:#777;display:none}.status.show{display:block}.status.error{background:#fff0ed;color:#ad4d3c}.mapping{display:none;margin-top:22px;padding-top:22px;border-top:1px solid var(--line)}.mapping.show{display:block}.result{display:none;margin-top:18px;padding:15px;border-radius:13px;background:#edf5ee}.result.show{display:block}.result strong{font-size:10px}.result textarea{width:100%;margin:9px 0;border:0;background:white;border-radius:8px;padding:8px;font:8px/1.5 ui-monospace,monospace;resize:none}.privacy{margin-top:15px;font-size:8px;color:#aaa;line-height:1.6}@media(max-width:760px){.wrap{grid-template-columns:1fr;margin-top:20px}.intro,.panel{padding:25px}.intro h1{font-size:34px}}
+    </style>
+  </head>
+  <body>
+    <header class="top"><span class="brand">◧ &nbsp; Notion Widget Box</span><a href="./">← 返回组件库</a></header>
+    <main class="wrap">
+      <section class="intro">
+        <p class="eyebrow">ZERO TOKEN · PUBLIC DATA</p>
+        <h1>把公开数据库<br /><em>变成组件数据。</em></h1>
+        <p>无需 Integration Token。连接器只读取你主动发布的 Notion 数据库，并只返回聚合后的进度或按日期统计值。</p>
+        <div class="steps"><div class="step"><i>1</i><span><b>发布数据库页面</b>Notion 右上角 Share → Publish，确认匿名窗口可以打开。</span></div><div class="step"><i>2</i><span><b>测试公开链接</b>连接器读取列名与类型，不会取得私有页面。</span></div><div class="step"><i>3</i><span><b>选择聚合方式</b>映射数值/日期列，生成可直接用于组件的数据 URL。</span></div></div>
+        <div class="notice">公开页面可能连同列名与行内容对任何拿到链接的人可见。请勿发布含姓名、邮箱、客户资料等敏感数据的数据库。</div>
+      </section>
+      <section class="panel">
+        <h2>公开数据连接</h2><p>先部署项目自带 Worker，再填写其地址。</p>
+        <form id="connectForm">
+          <label class="field"><span>公开读取 Worker 地址</span><input id="workerUrl" required placeholder="https://notion-widget-box-sync.xxx.workers.dev" /></label>
+          <label class="field"><span>公开 Notion 数据库链接</span><input id="notionUrl" type="url" required placeholder="https://your-space.notion.site/…" /></label>
+          <div class="row"><label class="field"><span>组件用途</span><select id="mode"><option value="progress">进度条</option><option value="heatmap">热力图</option></select></label><label class="field"><span>组件标题</span><input id="label" value="Notion 数据进度" maxlength="40" /></label></div>
+          <button class="button secondary" id="inspectButton" type="submit">读取公开列结构</button>
+        </form>
+        <div class="status" id="status"></div>
+        <section class="mapping" id="mapping">
+          <div id="progressFields"><div class="row"><label class="field"><span>当前值列</span><select id="currentColumn"></select></label><label class="field"><span>目标值列</span><select id="maxColumn"><option value="">不选（以行数为目标）</option></select></label></div></div>
+          <div id="heatmapFields" hidden><div class="row"><label class="field"><span>日期列</span><select id="dateColumn"></select></label><label class="field"><span>数值列</span><select id="valueColumn"><option value="">不选（每行计 1）</option></select></label></div></div>
+          <button class="button" id="generateButton" type="button">生成组件数据 URL</button>
+        </section>
+        <section class="result" id="result"><strong>连接成功</strong><textarea id="dataUrl" rows="4" readonly></textarea><button class="button" id="useButton" type="button">填入组件并返回</button></section>
+        <p class="privacy">技术说明：使用 Notion 的未公开公共页面接口兼容读取，不需要 Token，但接口可能随 Notion 改版。Worker 仅返回聚合结果并缓存 60 秒；手动数据始终可作为兜底。</p>
+      </section>
+    </main>
+    <script>
+      (()=>{const $=s=>document.querySelector(s),form=$("#connectForm"),status=$("#status"),mapping=$("#mapping"),result=$("#result");let columns=[];$("#workerUrl").value=localStorage.getItem("widgetBox.publicNotionWorker")||"";const show=(text,error=false)=>{status.textContent=text;status.className=`status show ${error?"error":""}`};const baseUrl=()=>$("#workerUrl").value.trim().replace(/\/$/,"");const endpoint=(mode)=>{const url=new URL(`${baseUrl()}/notion/public`);url.searchParams.set("page",$("#notionUrl").value.trim());url.searchParams.set("mode",mode);return url};const fill=(select,items,blank=false)=>{select.replaceChildren();if(blank)select.add(new Option("不选",""));items.forEach(item=>select.add(new Option(`${item.name} · ${item.type}`,item.id)));};form.onsubmit=async e=>{e.preventDefault();mapping.classList.remove("show");result.classList.remove("show");show("正在读取公开数据库结构…");try{const worker=baseUrl();if(!/^https?:\/\//.test(worker))throw new Error("请填写有效 Worker 地址");localStorage.setItem("widgetBox.publicNotionWorker",worker);const response=await fetch(endpoint("schema"));const data=await response.json();if(!response.ok)throw new Error(data.error||"读取失败");columns=data.columns||[];if(!columns.length)throw new Error("没有找到可读取的数据库列");fill($("#currentColumn"),columns.filter(x=>["number","formula","rollup","checkbox"].includes(x.type)));fill($("#maxColumn"),columns.filter(x=>["number","formula","rollup"].includes(x.type)),true);fill($("#dateColumn"),columns.filter(x=>["date","created_time","last_edited_time"].includes(x.type)));fill($("#valueColumn"),columns.filter(x=>["number","formula","rollup","checkbox"].includes(x.type)),true);show(`已读取「${data.title}」：${data.rowCount} 行、${columns.length} 列。`);mapping.classList.add("show");syncMode();}catch(error){show(error.message||"无法读取，请确认页面已 Publish。",true)}};function syncMode(){const heat=$("#mode").value==="heatmap";$("#progressFields").hidden=heat;$("#heatmapFields").hidden=!heat;}$("#mode").onchange=syncMode;$("#generateButton").onclick=()=>{const mode=$("#mode").value,url=endpoint(mode);url.searchParams.set("label",$("#label").value.trim());if(mode==="progress"){url.searchParams.set("current",$("#currentColumn").value);if($("#maxColumn").value)url.searchParams.set("max",$("#maxColumn").value);}else{url.searchParams.set("date",$("#dateColumn").value);if($("#valueColumn").value)url.searchParams.set("value",$("#valueColumn").value);}$("#dataUrl").value=url.toString();result.classList.add("show");};$("#useButton").onclick=async()=>{const value=$("#dataUrl").value;try{await navigator.clipboard.writeText(value)}catch{}if(window.opener){window.opener.postMessage({type:"notion-widget-box-data-url",value},location.origin);window.close();}else{$("#useButton").textContent="已复制，请粘贴到组件定制器";}};})();
+    </script>
+  </body>
+</html>
