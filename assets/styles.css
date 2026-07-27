@@ -135,4 +135,103 @@ footer { padding: 45px max(5vw,34px); background: #20201e; color: white; display
 @media (max-width: 720px) { .brand > span:last-child { display:none; }.global-search kbd { display:none; }.hero { padding-top: 55px; }.hero h1 { font-size: clamp(28px, 8vw, 45px); }.hero-lead { font-size:14px; }.trust-row { gap:9px; }.hero-art { height:340px; transform:scale(.85); transform-origin: left top; width:115%; }.demo-clock { width:290px; }.library { padding-inline:14px; }.catalog-toolbar { align-items:start; }.toolbar-controls select, .view-switch, .active-filters { display:none; }.widget-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap:9px; }.card-preview { height:145px; }.card-body { padding:12px; }.favorite-button { opacity:1; }.list-view .widget-card { grid-template-columns:120px 1fr; }.preview-canvas { min-height:330px; padding:16px; }.preview-frame.standard, .preview-frame.hero { width:100%; }.selected-heading { margin-top:20px; }.preset-grid { grid-template-columns:repeat(3,1fr); } footer { grid-template-columns:1fr 1fr; } footer > div:first-child { grid-column:1/-1; } }
 @media (max-width: 420px) { .widget-grid { grid-template-columns:1fr; }.card-preview { height:165px; }.hero-actions { flex-direction:column; align-items:stretch; }.demo-progress { right:0; }.customizer-preview { padding:15px 10px; }.dialog-top { padding:0 5px; }.preview-canvas { border-radius:16px; }.field-row { grid-template-columns:1fr; } }
 
+/* Mobile usability: contain horizontal filter rows, enlarge touch targets and avoid iOS input zoom. */
+@media (max-width: 960px) {
+  body { overflow-x: hidden; }
+  .library, .filter-panel, .catalog-main, .filter-group, .filter-list, .quick-chips, .widget-grid { min-width: 0; max-width: 100%; }
+  .filter-panel { width: 100%; overflow: hidden; }
+  .filter-list { width: 100%; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .filter-list::-webkit-scrollbar, .quick-chips::-webkit-scrollbar { display: none; }
+}
+
+@media (max-width: 720px) {
+  .topbar { grid-template-columns: 44px 1fr; gap: 8px 12px; padding: 10px 14px 12px; }
+  .brand { width: 44px; height: 44px; justify-content: center; }
+  .brand-mark { width: 32px; height: 32px; }
+  .github-button { width: 40px; height: 40px; }
+  .global-search { width: 100%; height: 48px; margin-bottom: 0; padding-left: 13px; }
+  .global-search input { font-size: 16px; }
+  .search-button { height: 40px; padding-inline: 16px; font-size: 11px; }
+
+  .hero { padding: 44px 20px 40px; }
+  .hero-lead { margin-top: 20px; line-height: 1.65; }
+  .hero-actions { margin-top: 24px; }
+  .hero-actions .primary-button, .hero-actions .secondary-button { min-height: 48px; }
+  .trust-row { margin-top: 20px; }
+  .hero-art { height: 300px; width: 125%; transform: scale(.78); }
+
+  .library { padding: 42px 14px 70px; }
+  .filter-panel { display: grid; gap: 7px; margin-bottom: 25px; }
+  .filter-group { padding: 0; }
+  .filter-list { gap: 6px; }
+  .filter-option { min-height: 44px; flex: none; padding: 10px 12px; font-size: 11px; }
+  .catalog-toolbar h2 { font-size: 26px; }
+  .quick-chips { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; margin: 18px 0 16px; padding-bottom: 6px; scrollbar-width: none; }
+  .quick-chips button { min-height: 40px; flex: none; padding: 8px 15px; font-size: 11px; }
+  .favorite-button { width: 40px; height: 40px; right: 10px; top: 10px; }
+  .card-footer button { min-height: 36px; padding: 8px 0; }
+  .load-more { min-height: 48px; font-size: 12px; }
+
+  .customizer { height: 100dvh; }
+  .customizer-preview { padding: 14px 12px 24px; }
+  .dialog-top { padding: 0; }
+  .save-state { display: none; }
+  .selected-heading { gap: 12px; margin: 18px 0; }
+  .selected-icon { width: 48px; height: 48px; border-radius: 14px; font-size: 21px; }
+  .selected-heading h2 { font-size: 22px; }
+  .preview-size-switch button { min-width: 48px; min-height: 44px; padding: 9px 10px; font-size: 10px; }
+  .preview-canvas { min-height: 290px; padding: 10px; }
+  .preview-frame.standard, .preview-frame.hero { height: 270px; }
+  .embed-box { margin-top: 14px; padding: 13px; }
+  .url-row input { min-height: 44px; font-size: 16px; }
+  .url-row .primary-button { min-height: 44px; }
+  .embed-box > .text-button { min-height: 40px; font-size: 10px; }
+
+  .control-head { padding: 18px; }
+  .control-section { padding: 20px 18px; }
+  .control-section h3 { font-size: 12px; }
+  .field { gap: 8px; margin-bottom: 15px; font-size: 11px; }
+  .field input, .field select, .field textarea { min-height: 46px; padding: 11px 12px; font-size: 16px; }
+  .field textarea { line-height: 1.5; }
+  .check-field { min-height: 40px; font-size: 12px; }
+  .check-field input { width: 18px; height: 18px; }
+  .preset { min-height: 62px; }
+  .preset span { font-size: 10px; }
+  .color-row input { height: 44px; }
+  .range-field { margin-top: 18px; }
+  .range-field > span { font-size: 11px; }
+  .range-field input { min-height: 32px; }
+  .toggle-row { gap: 8px 15px; }
+  .notion-connect-link { min-height: 46px; font-size: 11px; }
+  .control-footer { bottom: 0; gap: 10px; padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); }
+  .control-footer button { min-height: 48px; }
+
+  .pet-setup { width: calc(100vw - 24px); max-height: calc(100dvh - 24px); overflow-y: auto; }
+  .pet-setup form { padding: 28px 20px 24px; }
+  .pet-setup .close-button { width: 44px; height: 44px; right: 10px; top: 10px; }
+}
+
+@media (max-width: 600px) {
+  .widget-grid { grid-template-columns: 1fr; gap: 13px; }
+  .card-preview { height: 180px; }
+  .card-body { padding: 15px 16px 17px; }
+  .list-view .widget-card { grid-template-columns: 1fr; }
+  .list-view .card-preview { height: 150px; border-right: 0; border-bottom: 1px solid var(--line); }
+}
+
+@media (max-width: 420px) {
+  .search-feedback { display: none; }
+  .hero h1 { font-size: clamp(28px, 8.1vw, 34px); }
+  .preview-tools { align-items: flex-start; gap: 8px; }
+  .preview-tools > span { padding-top: 11px; }
+  .embed-box > div:first-child { display: grid; gap: 4px; }
+  .url-row { display: grid; grid-template-columns: 1fr; }
+  .preset-grid, .color-row { grid-template-columns: repeat(2, 1fr); }
+  footer { padding: 34px 20px; gap: 24px 16px; }
+}
+
+@media (hover: none) {
+  .widget-card:hover { transform: none; box-shadow: none; border-color: var(--line); }
+}
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.001ms !important; transition-duration:.001ms !important; } }
