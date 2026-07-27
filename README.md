@@ -2,6 +2,8 @@
 
 一个可直接部署到 GitHub Pages 的 Notion 小组件市场与可视化生成器。项目使用原生 HTML / CSS / JavaScript，无构建步骤、无默认后端。
 
+**在线使用：[zengyincen.github.io/notion-widget-box](https://zengyincen.github.io/notion-widget-box/)**
+
 - 73 个真实组件引擎
 - 6 套 Apple × Notion 视觉主题
 - 3 种响应式布局
