@@ -5,7 +5,6 @@
   const { components, themes } = window.WIDGET_BOX;
   const fontCatalog = window.WIDGET_FONTS;
   const managedService = window.WIDGET_BOX_SERVICE;
-  const publicBase = (managedService?.publicBase || location.origin).replace(/\/$/, "");
   const type = params.get("type") || "digital-clock";
   const meta = components.find((item) => item.id === type) || components[0];
   const theme = themes.find((item) => item.id === (params.get("theme") || "notion")) || themes[0];
@@ -273,24 +272,64 @@
   function petFace(state,mood=petMood(state).id){const kind=p("petType","cat"),faces={cat:{hungry:"/ᐠ •́ ﻌ •̀ ᐟ\\",thirsty:"/ᐠ｡ꞈ｡ᐟ\\",lonely:"/ᐠ •̥ ﻌ •̥ ᐟ\\",recovering:"/ᐠ - ﻌ - ᐟ\\",happy:"/ᐠ˵- ᴗ -˵ᐟ\\",delighted:"/ᐠ˵^ ﻌ ^˵ᐟ\\"},dog:{hungry:"૮ •́ ﻌ •̀ ა",thirsty:"૮ • ﻌ • ა",lonely:"૮ ᴗ̥ ﻌ ᴗ̥ ა",recovering:"૮ - ﻌ - ა",happy:"૮ ˶ᵔ ᵕ ᵔ˶ ა",delighted:"૮ ˶ˆ ﻌ ˆ˶ ა"},bunny:{hungry:"／(× ﻌ ×)＼",thirsty:"／(• ﻌ •)＼",lonely:"／(˘̩ ﻌ ˘̩)＼",recovering:"／(- ﻌ -)＼",happy:"／(=´ᆺ`=)＼",delighted:"／(=^ᆺ^=)＼"},blob:{hungry:"(｡•́︿•̀｡)",thirsty:"(｡•́ ₃ •̀｡)",lonely:"(っ˘̩╭╮˘̩)っ",recovering:"(｡- ᴗ -｡)",happy:"(｡•̀ᴗ-)✧",delighted:"٩(ˊᗜˋ*)و"}};return faces[kind]?.[mood]||faces.cat[mood]||faces.cat.happy;}
   function safePetId(value){const raw=String(value||"pet");if(/^[a-zA-Z0-9_-]{1,64}$/.test(raw))return raw;let a=2166136261,b=2246822507;for(const char of raw){const code=char.codePointAt(0);a=Math.imul(a^code,16777619);b=Math.imul(b^code,3266489909);}return `legacy-${(a>>>0).toString(16).padStart(8,"0")}${(b>>>0).toString(16).padStart(8,"0")}`;}
   async function renderPet(){
-    const mode=p("syncMode","managed")==="local"?"local":"managed",sync=(managedService?.apiBase||"").replace(/\/$/,""),petId=safePetId(p("petId",p("petName","Mochi")));let lastRevision=-1;
-    const localAction=(action)=>{const url=new URL("action.html",`${publicBase}/`);url.searchParams.set("pet",petId);url.searchParams.set("do",action);return url.toString();};
-    const draw=(state,label,actionBuilder)=>{
+    const mode=p("syncMode","managed")==="local"?"local":"managed";
+    const sync=(managedService?.apiBase||"").replace(/\/$/,"");
+    const petId=safePetId(p("petId",p("petName","Mochi")));
+    const twoHours=2*60*60*1000;
+    let lastRevision=-1,busy=false;
+    const waitLabel=seconds=>seconds>=3600?`${Math.ceil(seconds/3600)} 小时后`:`${Math.max(1,Math.ceil(seconds/60))} 分钟后`;
+    const draw=(state,label,onAction)=>{
       const mood=petMood(state),face=petFace(state,mood.id),food=Math.round(state.food),water=Math.round(state.water),love=Math.round(state.love);
-      const waitLabel=seconds=>seconds>=3600?`${Math.ceil(seconds/3600)} 小时后`:`${Math.max(1,Math.ceil(seconds/60))} 分钟后`,feedWait=Number(state.cooldowns?.feed)||0,waterWait=Number(state.cooldowns?.water)||0;
-      const careLink=(action,emoji,label,wait=0)=>wait?`<span class="action secondary is-disabled" title="${esc(waitLabel(wait))}可再次操作">${emoji} ${esc(waitLabel(wait))}</span>`:`<a class="action secondary" data-pet-action="${action}" target="pet-action" href="${esc(actionBuilder(action,state))}">${emoji} ${label}</a>`;
-      setWidget(`<div class="pet-layout"><div class="pet-visual pet-mood-${mood.id}"><span class="pet-status-bubble" id="petBubble">${esc(mood.bubble)}</span><span class="pet-emojis" id="petEmojis">${esc(mood.emojis)}</span><div class="pet-face" id="petAnimatedFace">${esc(face)}<i></i></div></div><div class="pet-copy"><p class="kicker">${esc(p("ownerName","朋友"))}’S COMPANION · ${label}</p><h2 class="title">${esc(p("petName","Mochi"))}</h2><p class="caption muted" id="petMessage">${esc(mood.message)}</p>${b("showNeeds",true)?`<div class="pet-needs"><span>🍙 饱腹 <i><b style="width:${food}%"></b></i></span><span>💧 水分 <i><b style="width:${water}%"></b></i></span><span>🫶 安心 <i><b style="width:${love}%"></b></i></span></div>`:""}<div class="button-row">${careLink("feed","🍙","喂食",feedWait)}${careLink("water","💧","喂水",waterWait)}${careLink("pet","🫳","抚摸")}</div></div></div>`);
-      root.querySelectorAll("[data-pet-action]").forEach(link=>link.addEventListener("click",()=>{
-        const animatedFace=$("petAnimatedFace"),bubble=$("petBubble"),message=$("petMessage"),action=link.dataset.petAction;
+      const feedWait=Number(state.cooldowns?.feed)||0,waterWait=Number(state.cooldowns?.water)||0;
+      const careButton=(action,emoji,text,wait=0)=>`<button type="button" class="action secondary ${wait?"is-disabled":""}" data-pet-action="${action}" ${wait||busy?"disabled":""} title="${wait?`${esc(waitLabel(wait))}可再次操作`:"直接在组件内完成"}">${emoji} ${wait?esc(waitLabel(wait)):text}</button>`;
+      setWidget(`<div class="pet-layout"><div class="pet-visual pet-mood-${mood.id}"><span class="pet-status-bubble" id="petBubble">${esc(mood.bubble)}</span><span class="pet-emojis" id="petEmojis">${esc(mood.emojis)}</span><div class="pet-face" id="petAnimatedFace">${esc(face)}<i></i></div></div><div class="pet-copy"><p class="kicker">${esc(p("ownerName","朋友"))}’S COMPANION · ${label}</p><h2 class="title">${esc(p("petName","Mochi"))}</h2><p class="caption muted" id="petMessage">${esc(mood.message)}</p>${b("showNeeds",true)?`<div class="pet-needs"><span>🍙 饱腹 <i><b style="width:${food}%"></b></i></span><span>💧 水分 <i><b style="width:${water}%"></b></i></span><span>🫶 安心 <i><b style="width:${love}%"></b></i></span></div>`:""}<div class="button-row">${careButton("feed","🍙","喂食",feedWait)}${careButton("water","💧","喂水",waterWait)}${careButton("pet","🫳","抚摸")}</div></div></div>`);
+      root.querySelectorAll("[data-pet-action]").forEach(button=>button.addEventListener("click",async()=>{
+        if(busy||button.disabled)return;
+        const action=button.dataset.petAction,snapshot=state;
+        busy=true;
+        root.querySelectorAll("[data-pet-action]").forEach(item=>{item.disabled=true;});
+        button.textContent="同步中…";
+        const animatedFace=$("petAnimatedFace"),bubble=$("petBubble"),message=$("petMessage");
         animatedFace?.classList.remove("satisfied");void animatedFace?.offsetWidth;animatedFace?.classList.add("satisfied");
-        if(bubble)bubble.textContent=action==="pet"?"🥰 好舒服":action==="feed"?"🍙 等我开饭":"💧 马上喝水";
-        if(message)message.textContent=action==="pet"?"好舒服！我很喜欢你的抚摸 💖":"已提交，等待状态同步…";
+        if(bubble)bubble.textContent=action==="pet"?"🥰 好舒服":action==="feed"?"🍙 正在投喂":"💧 正在喂水";
+        if(message)message.textContent="正在同步状态，不会打开新页面…";
+        try{
+          const next=await onAction(action);
+          busy=false;
+          draw(next,label,onAction);
+          const accepted=next.accepted!==false,nextFace=$("petAnimatedFace"),nextBubble=$("petBubble"),nextMessage=$("petMessage");
+          if(accepted){nextFace?.classList.remove("satisfied");void nextFace?.offsetWidth;nextFace?.classList.add("satisfied");}
+          if(nextBubble)nextBubble.textContent=accepted?(action==="pet"?"🥰 好舒服":action==="feed"?"🍙 已经吃到啦":"💧 已经喝到啦"):"⏳ 等一下再照顾我";
+          if(nextMessage)nextMessage.textContent=next.message||(accepted?"状态已经同步到所有嵌入页面。":"这次操作没有重复计入。");
+        }catch{
+          busy=false;
+          draw(snapshot,label,onAction);
+          const failedBubble=$("petBubble"),failedMessage=$("petMessage");
+          if(failedBubble)failedBubble.textContent="☁️ 同步失败";
+          if(failedMessage)failedMessage.textContent="网络暂时不稳定，请稍后在这里重试。";
+        }
       }));
       if(lastRevision>=0&&state.revision>lastRevision){$("petAnimatedFace")?.classList.add("satisfied");const bubble=$("petBubble");if(bubble)bubble.textContent="✨ 状态恢复啦";}
       lastRevision=state.revision??lastRevision;
     };
-    if(mode==="managed"&&sync&&/^https?:\/\//i.test(sync)){const refresh=async()=>{try{const response=await fetch(`${sync}/pet/${encodeURIComponent(petId)}`,{cache:"no-store"});if(!response.ok)throw new Error();draw(await response.json(),"云端同步",action=>`${sync}/pet/${encodeURIComponent(petId)}/action/${action}`);}catch{errorCard("云端同步暂时忙碌，请稍后再试。");}};loadingCard("正在唤醒宠物");await refresh();interval(refresh,2000);return;}
-    let state=decayPet(getJSON(petStateKey(),petDefaults()));const drawLocal=()=>{putJSON(petStateKey(),state);draw(state,"本机模式",localAction);};drawLocal();const onStorage=e=>{if(e.key===petStateKey()){state=decayPet(getJSON(petStateKey(),petDefaults()));drawLocal();}};window.addEventListener("storage",onStorage);interval(()=>{state=decayPet(state);drawLocal();},60000);disposers.push(()=>window.removeEventListener("storage",onStorage));
+    if(mode==="managed"&&sync&&/^https?:\/\//i.test(sync)){
+      const endpoint=`${sync}/pet/${encodeURIComponent(petId)}`;
+      let refreshing=false;
+      const act=async action=>{const response=await fetch(`${endpoint}/action/${action}`,{method:"POST",cache:"no-store",headers:{Accept:"application/json"}});const data=await response.json();if(!response.ok)throw new Error(data.error||"Action failed");return data;};
+      const refresh=async()=>{if(busy||refreshing)return;refreshing=true;try{const response=await fetch(endpoint,{cache:"no-store"});if(!response.ok)throw new Error();draw(await response.json(),"云端同步",act);}catch{errorCard("云端同步暂时忙碌，请稍后再试。");}finally{refreshing=false;}};
+      loadingCard("正在唤醒宠物");
+      interval(refresh,2000);
+      return;
+    }
+    let state=decayPet(getJSON(petStateKey(),petDefaults()));
+    const localView=(extra={})=>({...state,cooldowns:{feed:Math.max(0,Math.ceil((twoHours-(Date.now()-Number(state.lastFeed||0)))/1000)),water:Math.max(0,Math.ceil((twoHours-(Date.now()-Number(state.lastWater||0)))/1000))},...extra});
+    const actLocal=async action=>{const now=Date.now();state=decayPet(state);if(action==="feed"&&now-Number(state.lastFeed||0)<twoHours)return localView({action,accepted:false,cooldown:true,message:"两小时内已经喂过啦。"});if(action==="water"&&now-Number(state.lastWater||0)<twoHours)return localView({action,accepted:false,cooldown:true,message:"两小时内已经喂过水啦。"});if(action==="feed"){state.food=Math.min(100,state.food+34);state.lastFeed=now;}if(action==="water"){state.water=Math.min(100,state.water+40);state.lastWater=now;}if(action==="pet")state.love=Math.min(100,state.love+12);state.revision=Number(state.revision||0)+1;putJSON(petStateKey(),state);return localView({action,accepted:true,message:action==="pet"?"好舒服，它很喜欢你的抚摸。":"状态已保存在当前设备。"});};
+    const drawLocal=()=>{putJSON(petStateKey(),state);draw(localView(),"本机模式",actLocal);};
+    drawLocal();
+    const onStorage=e=>{if(e.key===petStateKey()){state=decayPet(getJSON(petStateKey(),petDefaults()));drawLocal();}};
+    window.addEventListener("storage",onStorage);
+    interval(()=>{state=decayPet(state);drawLocal();},60000);
+    disposers.push(()=>window.removeEventListener("storage",onStorage));
   }
   function renderAlmanac(){const id=dateId(),rand=seeded(id),good=["整理","会友","学习","创作","运动","出行","阅读","早睡"],bad=["拖延","冲动消费","熬夜","过度承诺","争执","久坐"],colors=["杏仁白","雾霾蓝","鼠尾草绿","日落橙","淡紫灰"],dirs=["东","东南","南","西南","西","西北","北","东北"],pick=(arr,count)=>[...arr].sort(()=>rand()-.5).slice(0,count);setWidget(`<div class="calendar-head"><div><p class="kicker">${esc(formatDate(new Date(),{year:"numeric",month:"long",day:"numeric"}))}</p><strong>${esc(p("title","今日黄历"))}</strong></div><div class="almanac-day">${new Date().getDate()}</div></div>${b("showLunar",true)?`<p class="caption muted">农历参考 · ${lunarApprox(new Date())}</p>`:""}<div class="almanac-grid"><div><b>宜</b><span>${pick(good,3).join(" · ")}</span></div><div><b>忌</b><span>${pick(bad,2).join(" · ")}</span></div></div>${b("showLucky",true)?`<p class="caption muted">幸运色：${colors[Math.floor(rand()*colors.length)]} · 幸运方位：${dirs[Math.floor(rand()*dirs.length)]}</p>`:""}`);}
   function lunarApprox(date){const dayNames=["初一","初二","初三","初四","初五","初六","初七","初八","初九","初十","十一","十二","十三","十四","十五","十六","十七","十八","十九","二十","廿一","廿二","廿三","廿四","廿五","廿六","廿七","廿八","廿九","三十"];const known=new Date("2025-01-29"),days=Math.floor((date-known)/864e5),lunarDay=((days%29.5306)+29.5306)%29.5306;return dayNames[Math.floor(lunarDay)%30]+" · 宜顺势而为";}

@@ -411,6 +411,7 @@
 
   function widgetUrl(base = publicBase) {
     const url = new URL("widget.html", `${base}/`);
+    url.searchParams.set("v", "20260727.6");
     url.searchParams.set("type", state.selected.component.id);
     Object.entries(state.config).forEach(([key, value]) => {
       if (["syncMode", "syncUrl", "githubRepo"].includes(key)) return;
