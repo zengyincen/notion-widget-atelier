@@ -7,7 +7,8 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const featureCategories = [
     { id: "feature-progress", label: "进度条专区", icon: "▰", featured: true, componentIds: ["progress", "database-progress", "segmented-progress", "day-progress", "week-progress", "month-progress", "year-progress", "financial-goal", "savings-goal"] },
-    { id: "feature-pet", label: "桌面宠物", icon: "◕", featured: true, componentIds: ["pet-companion"] }
+    { id: "feature-pet", label: "桌面宠物", icon: "◕", featured: true, componentIds: ["pet-companion"] },
+    { id: "feature-music", label: "音乐播放器", icon: "♫", featured: true, componentIds: ["music-player", "vinyl-player", "cassette-player", "ambient-mixer"] }
   ];
   const displayCategories = [categories[0], ...featureCategories, ...categories.slice(1)];
   const categoryMap = Object.fromEntries([...categories, ...featureCategories].map((item) => [item.id, item]));
@@ -52,7 +53,8 @@
   }
 
   function init() {
-    if (components.length * themes.length * layouts.length !== 1314) console.warn("Template registry count changed", variants.length);
+    $$('[data-total-components]').forEach((element) => { element.textContent = components.length.toLocaleString("zh-CN"); });
+    $$('[data-total-variants]').forEach((element) => { element.textContent = variants.length.toLocaleString("zh-CN"); });
     els.search.value = state.query;
     els.offline.checked = state.offline;
     els.sort.value = state.sort;

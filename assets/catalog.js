@@ -16,6 +16,29 @@
     added: extra.added || 2025
   });
 
+  const demoAudio = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+  const demoCover = "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=900&q=85";
+  const audioFields = [
+    F.select("musicSource", "音乐来源", "direct", [["direct", "直链 / 手动歌单"], ["meting", "Meting 歌曲 / 歌单"]]),
+    F.text("trackName", "歌曲名称", "Midnight Atelier"),
+    F.text("artist", "歌手 / 创作者", "Open Audio Demo"),
+    F.text("audioUrl", "音频直链", demoAudio, "https://example.com/audio.mp3"),
+    F.text("coverUrl", "封面图片", demoCover, "https://example.com/cover.jpg"),
+    F.area("playlist", "手动歌单（填写后覆盖单曲）", "", "每行：歌名|歌手|音频链接|封面链接"),
+    F.select("server", "Meting 平台", "netease", [["netease", "网易云音乐"], ["tencent", "QQ 音乐"], ["kugou", "酷狗音乐"], ["baidu", "百度音乐"]]),
+    F.select("resourceType", "Meting 类型", "playlist", [["playlist", "歌单"], ["song", "单曲"], ["album", "专辑"], ["artist", "歌手"]]),
+    F.text("resourceId", "歌曲 / 歌单 ID", "9173198673"),
+    F.text("metingApi", "Meting API 模板", "https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r"),
+    F.area("lyrics", "歌词（支持 LRC 时间轴）", "[00:00.00]Midnight Atelier\n[00:06.00]Let the quiet rhythm stay\n[00:12.00]把此刻留在你的页面里"),
+    F.toggle("showLyrics", "显示歌词", true),
+    F.toggle("showPlaylist", "显示播放列表", true),
+    F.toggle("visualizer", "显示动态频谱", true),
+    F.toggle("autoplay", "尝试自动播放", false),
+    F.select("loopMode", "循环模式", "all", [["none", "播完停止"], ["all", "列表循环"], ["one", "单曲循环"]]),
+    F.select("order", "播放顺序", "list", [["list", "顺序播放"], ["random", "随机播放"]]),
+    F.num("volume", "初始音量（%）", 70, 0, 100)
+  ];
+
   const components = [
     C("digital-clock", "数字时钟", "time", "◷", "精确、安静的本地数字时钟。", [F.text("title", "问候标题", "今天也要保持专注"), F.select("hour12", "时制", "false", [["false", "24 小时"], ["true", "12 小时"]]), F.toggle("seconds", "显示秒钟", true)], { tags: ["clock", "时钟", "时间"], popular: true }),
     C("analog-clock", "模拟时钟", "time", "◴", "带秒针与刻度的经典表盘。", [F.text("title", "表盘标题", "SHANGHAI"), F.toggle("seconds", "显示秒针", true)], { tags: ["clock", "analog", "钟表"], popular: true }),
@@ -64,6 +87,19 @@
     C("holiday", "节日提示", "info", "✺", "显示下一个重要节日。", [F.text("holidayName", "节日名称", "新年"), F.date("holidayDate", "节日日期", "2027-01-01")], { tags: ["holiday", "节日", "countdown"], isNew: true }),
     C("sunrise", "日出日落", "info", "◑", "根据城市显示日出与日落。", [F.text("city", "城市 / 地区", "上海"), F.toggle("dayLength", "显示日长", true)], { tags: ["sunrise", "sunset", "日出"], online: true }),
 
+    C("vertical-poem", "竖排诗词", "media", "诗", "参考随机诗句组件重制的东方竖排诗笺。", [F.select("poemSource", "诗句来源", "daily", [["daily", "今日诗词随机 API"], ["custom", "自定义诗句"]]), F.text("poemTheme", "API 主题拼音（可空）", ""), F.text("poemCatalog", "API 子分类拼音（可空）", ""), F.area("poem", "自定义诗句", "山光悦鸟性，潭影空人心。\n万籁此都寂，但余钟磬音。"), F.text("poemTitle", "诗名", "题破山寺后禅院"), F.text("poet", "作者", "常建"), F.toggle("showPoet", "显示作者", true), F.toggle("showPoemTitle", "显示诗名", true), F.select("writingDirection", "阅读方向", "rtl", [["rtl", "从右向左"], ["ltr", "从左向右"]]), F.num("poemSize", "诗句字号", 20, 12, 42)], { tags: ["poem", "诗词", "古诗", "竖排", "今日诗词", "art"], popular: true, isNew: true, online: true }),
+    C("scenic-quote", "景深引言", "media", "❝", "参考英文引言组件重制的图片与文字艺术卡。", [F.select("quoteSource", "内容来源", "daily", [["daily", "每日内置引言"], ["custom", "自定义引言"]]), F.area("quote", "引言", "Art enables us to find ourselves and lose ourselves at the same time."), F.text("author", "署名", "Thomas Merton"), F.text("backgroundUrl", "背景图片", "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=85"), F.num("overlay", "遮罩强度（%）", 42, 0, 85), F.num("imageBlur", "背景模糊（px）", 0, 0, 16), F.select("quotePosition", "文字位置", "bottom", [["center", "居中"], ["bottom", "左下"], ["editorial", "杂志排版"]])], { tags: ["quote", "引言", "bing", "图片", "art", "艺术"], popular: true, isNew: true, online: true }),
+    C("music-player", "音乐播放器", "media", "♫", "支持直链、手动歌单与 Meting 资源的完整播放器。", [...audioFields, F.select("playerStyle", "播放器造型", "studio", [["studio", "录音室"], ["minimal", "极简横条"], ["glass", "玻璃舞台"]])], { tags: ["music", "player", "音乐", "歌单", "Meting", "APlayer", "歌词"], popular: true, isNew: true, interactive: true, online: true }),
+    C("vinyl-player", "黑胶唱片机", "media", "◉", "会随音乐旋转的艺术黑胶播放器。", audioFields, { tags: ["music", "vinyl", "黑胶", "唱片", "艺术"], popular: true, isNew: true, interactive: true, online: true }),
+    C("cassette-player", "复古磁带机", "media", "▣", "双磁带轮与机械按键构成的复古播放器。", audioFields, { tags: ["music", "cassette", "磁带", "复古", "播放器"], isNew: true, interactive: true, online: true }),
+    C("ambient-mixer", "氛围声音混音", "media", "≋", "自由混合雨声、咖啡馆与篝火音轨。", [F.text("title", "场景名称", "Rainy Reading Room"), F.text("rainUrl", "雨声音频链接", ""), F.text("cafeUrl", "咖啡馆音频链接", ""), F.text("fireUrl", "篝火音频链接", ""), F.num("rainVolume", "雨声音量", 65, 0, 100), F.num("cafeVolume", "咖啡馆音量", 25, 0, 100), F.num("fireVolume", "篝火音量", 35, 0, 100)], { tags: ["ambient", "sound", "mixer", "白噪音", "氛围", "音乐"], isNew: true, interactive: true, online: true }),
+    C("lyric-card", "动态歌词卡", "media", "♪", "让歌词、翻译或短句逐行浮现。", [F.text("songTitle", "标题", "Night Letters"), F.text("artist", "署名", "Your Playlist"), F.area("lyricLines", "歌词（原文|翻译，每行一条）", "Stay with the quiet light|留在安静的光里\nLet every small moment sing|让每一个微小瞬间歌唱\nWe are here, and that is enough|此刻在这里，已经足够"), F.num("lineInterval", "换行秒数", 5, 2, 30), F.select("typeMotion", "切换动画", "fade", [["fade", "淡入淡出"], ["slide", "纵向滑入"], ["rotate", "旋转出现"]]), F.toggle("showTranslation", "显示翻译", true), F.toggle("autoAdvance", "自动轮播", true)], { tags: ["lyrics", "歌词", "字幕", "动态文字", "艺术"], isNew: true, interactive: true }),
+    C("album-cover", "专辑封面墙", "media", "▧", "把一张图片变成精致的专辑视觉封面。", [F.text("albumTitle", "专辑名称", "Soft Hours"), F.text("artist", "艺术家", "Atelier No. 7"), F.text("coverUrl", "封面图片", "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=1000&q=85"), F.text("catalogNumber", "唱片编号", "NW–2026–07"), F.toggle("showParental", "显示标识", false), F.select("coverLayout", "封面形式", "editorial", [["editorial", "杂志"], ["minimal", "留白"], ["full", "满版"]])], { tags: ["album", "cover", "专辑", "封面", "艺术"], isNew: true, online: true }),
+    C("kinetic-type", "动态文字海报", "media", "Aa", "循环切换词语的动态字体艺术海报。", [F.text("headline", "主标题", "MAKE SPACE"), F.area("words", "动态词语（每行一个）", "TO THINK\nTO FEEL\nTO CREATE"), F.num("wordInterval", "切换秒数", 3, 1, 12), F.select("typeMotion", "动态形式", "slide", [["slide", "纵向滑入"], ["fade", "淡入淡出"], ["rotate", "旋转出现"]]), F.toggle("showGrid", "显示设计网格", true)], { tags: ["kinetic", "typography", "动态排版", "字体", "海报", "艺术"], isNew: true, interactive: true }),
+    C("generative-art", "生成艺术画布", "media", "✦", "根据种子生成独一无二的抽象几何作品。", [F.text("artSeed", "作品种子", "notion-atelier"), F.num("shapeCount", "图形数量", 18, 5, 42), F.select("shapeStyle", "图形语言", "orbital", [["orbital", "轨道"], ["bauhaus", "包豪斯"], ["paper", "剪纸"]]), F.toggle("animateArt", "缓慢动态", true), F.toggle("showSignature", "显示签名", true)], { tags: ["generative", "art", "生成艺术", "抽象", "bauhaus", "艺术"], popular: true, isNew: true, interactive: true }),
+    C("gradient-mesh", "流体渐变", "media", "◌", "缓慢流动的多层柔光渐变背景。", [F.text("meshTitle", "标题", "A quiet place for ideas"), F.num("meshIntensity", "色彩强度", 72, 20, 100), F.select("meshMood", "渐变情绪", "aurora", [["aurora", "极光"], ["sunset", "落日"], ["ocean", "深海"], ["mono", "黑白"]]), F.toggle("animateMesh", "流体动画", true), F.toggle("showMeshTitle", "显示标题", true)], { tags: ["gradient", "mesh", "渐变", "流体", "氛围", "艺术"], isNew: true }),
+    C("constellation", "星图签名", "media", "✧", "可定制日期、地点与寄语的浪漫星图。", [F.text("starTitle", "星图标题", "The night we began"), F.date("starDate", "纪念日期", "2026-07-27"), F.text("starPlace", "地点", "Shanghai · 31.2304° N"), F.text("starMessage", "寄语", "Under the same sky."), F.text("starSeed", "星图种子", "our-night"), F.num("starDensity", "星星数量", 32, 12, 70), F.toggle("twinkle", "星光闪烁", true)], { tags: ["constellation", "stars", "星图", "纪念日", "浪漫", "艺术"], isNew: true }),
+
     C("financial-goal", "财务目标", "life", "¥", "可视化储蓄或还款目标。", [F.text("label", "目标名称", "旅行基金"), F.num("value", "当前金额", 6800, 0, 99999999), F.num("max", "目标金额", 10000, 1, 99999999), F.text("currency", "货币符号", "¥")], { tags: ["finance", "goal", "财务"], popular: true }),
     C("savings-goal", "储蓄罐", "life", "◒", "把长期储蓄变成可见进展。", [F.text("label", "目标名称", "梦想储蓄罐"), F.num("value", "已存", 2400, 0, 99999999), F.num("max", "目标", 8000, 1, 99999999)], { tags: ["savings", "money", "储蓄"], interactive: true }),
     C("photo-gallery", "照片画廊", "life", "▧", "支持自定义图片链接的拼贴画廊。", [F.area("images", "图片链接（每行一个）", "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80\nhttps://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80\nhttps://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=800&q=80"), F.text("title", "标题", "最近的风景")], { tags: ["gallery", "photo", "照片"], popular: true, online: true }),
@@ -105,6 +141,7 @@
     { id: "focus", label: "效率与专注", icon: "◎" },
     { id: "tools", label: "实用工具", icon: "⌁" },
     { id: "info", label: "信息与灵感", icon: "☀" },
+    { id: "media", label: "音乐与艺术", icon: "♫" },
     { id: "life", label: "生活与记录", icon: "♡" },
     { id: "links", label: "链接与社交", icon: "↗" },
     { id: "data", label: "数据与目标", icon: "▥" }

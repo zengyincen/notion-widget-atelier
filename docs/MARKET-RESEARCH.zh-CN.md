@@ -6,7 +6,7 @@
 
 市场的核心缺口不是“缺少更多时钟”，而是缺少一个同时满足以下条件的产品：免费、无需账号、风格统一、响应式、高度可定制、稳定托管、能覆盖基础展示与轻交互，并清楚区分本地状态与跨设备同步。
 
-因此 Notion Widget Box 采用“少量可维护的组件引擎 × 多主题 × 多布局”的组合架构，而不是复制上千份静态 HTML。73 个引擎 × 6 套主题 × 3 种布局生成 1,314 个可检索模板，所有模板仍共享同一套可靠实现。
+因此 Notion Widget Box 采用“少量可维护的组件引擎 × 多主题 × 多布局”的组合架构，而不是复制上千份静态 HTML。85 个引擎 × 6 套主题 × 3 种布局生成 1,530 个可检索模板，所有模板仍共享同一套可靠实现。
 
 ## 市场信号
 
@@ -68,6 +68,7 @@ P2：黄历、星座、节气、每日卡牌、情绪轨道、虚拟植物、专
 ## 调研来源
 
 - [ShoroukAziz/notion_widgets](https://github.com/ShoroukAziz/notion_widgets) — 开源静态组件参考，调研时约 629 Stars。
+- [RylanBot/awesome-notion-widgets](https://github.com/RylanBot/awesome-notion-widgets) 及其配套文章 — 随机诗词、图片引言与 Meting/APlayer 音乐播放器的参数和使用场景。
 - [Apption](https://apption.co/) — 组件品类、累计生成量、浏览量与单品热度。
 - [Indify](https://indify.co/) — 定制与统一体验定位。
 - [Widgets For Notion: Best Free Notion Widgets in 2026](https://widgetsfornotion.com/blog/best-notion-widgets) — 高频品类、安装路径与风格系列。
