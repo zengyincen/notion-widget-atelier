@@ -4,6 +4,9 @@
   "main": "src/index.js",
   "compatibility_date": "2026-07-27",
   "workers_dev": true,
+  "routes": [
+    { "pattern": "nwb.imnotfound.eu.org", "custom_domain": true }
+  ],
   "observability": { "enabled": true, "head_sampling_rate": 1 },
   "durable_objects": {
     "bindings": [

@@ -3,6 +3,9 @@
 
   const { components, categories, themes, layouts } = window.WIDGET_BOX;
   const fontCatalog = window.WIDGET_FONTS;
+  const serviceConfig = window.WIDGET_BOX_SERVICE;
+  const publicBase = (serviceConfig?.publicBase || location.origin).replace(/\/$/, "");
+  const localPreviewBase = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname) ? location.origin : publicBase;
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const featureCategories = [
@@ -138,7 +141,8 @@
     });
     els.dialog.addEventListener("click", (event) => { if (event.target === els.dialog) els.dialog.close(); });
     window.addEventListener("message", (event) => {
-      if (event.origin !== location.origin || event.data?.type !== "notion-widget-box-data-url" || !state.selected) return;
+      const trustedOrigins = new Set([location.origin, new URL(publicBase).origin]);
+      if (!trustedOrigins.has(event.origin) || event.data?.type !== "notion-widget-box-data-url" || !state.selected) return;
       state.config.dataUrl = String(event.data.value || "");
       writeConfigToForm();
       updatePreview();
@@ -281,7 +285,9 @@
     const petAction = component.id !== "pet-companion" ? "" : petProfile
       ? '<button class="text-button" id="newPetButton" type="button">＋ 创建另一只独立宠物</button>'
       : '<div class="pet-adopt-callout"><strong>先看看它是否适合你</strong><span>选好宠物、主题和样式后，再创建专属名字。</span><button class="primary-button" id="adoptPetButton" type="button">喜欢这只，给它取名字 →</button></div>';
-    els.dynamicFields.innerHTML = (visibleFields.map(fieldTemplate).join("") || '<p class="field-note">这个组件无需额外内容设置。</p>') + petAction + (["database-progress", "heatmap"].includes(component.id) ? '<a class="notion-connect-link" href="connect.html" target="_blank">安全连接 Notion 数据库 <span>↗</span></a>' : "") + (component.id === "database-progress" ? '<div class="formula-helper"><strong>Notion Formula 2.0</strong><textarea id="formulaOutput" rows="7" readonly></textarea><button class="text-button" id="copyFormula" type="button">复制数据库公式</button></div>' : "");
+    const connectUrl = new URL("connect.html", `${publicBase}/`);
+    connectUrl.searchParams.set("returnOrigin", location.origin);
+    els.dynamicFields.innerHTML = (visibleFields.map(fieldTemplate).join("") || '<p class="field-note">这个组件无需额外内容设置。</p>') + petAction + (["database-progress", "heatmap"].includes(component.id) ? `<a class="notion-connect-link" href="${escapeHtml(connectUrl)}" target="_blank">安全连接 Notion 数据库 <span>↗</span></a>` : "") + (component.id === "database-progress" ? '<div class="formula-helper"><strong>Notion Formula 2.0</strong><textarea id="formulaOutput" rows="7" readonly></textarea><button class="text-button" id="copyFormula" type="button">复制数据库公式</button></div>' : "");
     els.presetGrid.innerHTML = themes.map((item) => `<button class="preset ${state.config.theme === item.id ? "is-active" : ""}" data-preset="${item.id}" type="button"><i style="--a:${item.bg};--b:${item.accent}"></i><span>${item.short}</span></button>`).join("");
     $("#layoutSelect").innerHTML = layouts.map((item) => `<option value="${item.id}">${item.label} · ${item.width}×${item.height}</option>`).join("");
     if (component.id === "pet-companion") {
@@ -403,8 +409,8 @@
     if (updateConfig && state.selected) updatePreview();
   }
 
-  function widgetUrl() {
-    const url = new URL("widget.html", location.href);
+  function widgetUrl(base = publicBase) {
+    const url = new URL("widget.html", `${base}/`);
     url.searchParams.set("type", state.selected.component.id);
     Object.entries(state.config).forEach(([key, value]) => {
       if (["syncMode", "syncUrl", "githubRepo"].includes(key)) return;
@@ -420,7 +426,7 @@
     $("#previewCanvas").classList.toggle("is-dark", state.config.theme === "midnight");
     els.frameWrap.style.background = state.config.theme === "midnight" ? "#000" : "#fff";
     els.shareUrl.value = state.petNeedsAdoption ? "请先确认领养并给宠物取名字" : url;
-    els.frame.src = url;
+    els.frame.src = widgetUrl(localPreviewBase);
   }
 
   async function copyText(text, message) {

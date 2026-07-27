@@ -2,7 +2,9 @@
 
 > 本文档面向服务管理员。终端用户无需部署 Worker、填写服务地址或接触任何密钥。
 
-生产服务：`https://notion-widget-box-sync.ethanz.workers.dev`
+生产服务：`https://nwb.imnotfound.eu.org`
+
+`workers.dev` 地址只作为管理员故障排查备用入口；所有面向用户的宠物动作、状态读取和公开 Notion 数据链接都使用生产自定义域名。
 
 ## 服务职责
 
@@ -25,10 +27,10 @@ npm run deploy
 部署后验证健康状态：
 
 ```bash
-curl https://notion-widget-box-sync.ethanz.workers.dev/health
+curl https://nwb.imnotfound.eu.org/health
 ```
 
-若 Worker 地址发生变化，请同步更新 `assets/service.js`，再发布 GitHub Pages。
+若 Worker 地址发生变化，请同步更新 `assets/service.js` 和 `wrangler.jsonc`，再发布 GitHub Pages。
 
 ## 管理员重置
 
@@ -43,7 +45,7 @@ npx wrangler secret put RESET_SECRET
 ```bash
 curl -X POST \
   -H "Authorization: Bearer <RESET_SECRET>" \
-  "https://notion-widget-box-sync.ethanz.workers.dev/pet/<PET_ID>/reset"
+  "https://nwb.imnotfound.eu.org/pet/<PET_ID>/reset"
 ```
 
 ## 公开接口

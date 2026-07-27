@@ -46,6 +46,11 @@
         const mapping = $("#mapping");
         const result = $("#result");
         const serviceBase = window.WIDGET_BOX_SERVICE.apiBase.replace(/\/$/, "");
+        const publicOrigin = new URL(window.WIDGET_BOX_SERVICE.publicBase).origin;
+        const requestedReturnOrigin = new URLSearchParams(location.search).get("returnOrigin") || "";
+        const allowedReturnOrigins = new Set([location.origin, publicOrigin, "https://zengyincen.github.io"]);
+        const localReturn = (() => { try { const url = new URL(requestedReturnOrigin); return url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname); } catch { return false; } })();
+        const returnOrigin = allowedReturnOrigins.has(requestedReturnOrigin) || localReturn ? requestedReturnOrigin : publicOrigin;
         let columns = [];
         const show = (text, error = false) => {
           status.textContent = text;
@@ -108,7 +113,7 @@
           const value = $("#dataUrl").value;
           try { await navigator.clipboard.writeText(value); } catch {}
           if (window.opener) {
-            window.opener.postMessage({ type: "notion-widget-box-data-url", value }, location.origin);
+            window.opener.postMessage({ type: "notion-widget-box-data-url", value }, returnOrigin);
             window.close();
           } else {
             $("#useButton").textContent = "已复制，请粘贴到组件定制器";

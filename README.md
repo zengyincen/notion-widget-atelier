@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://zengyincen.github.io/notion-widget-box/">
+  <a href="https://widget.imnotfound.eu.org/">
     <img src="./favicon.svg" width="88" height="88" alt="Notion Widget Box icon" />
   </a>
 </p>
@@ -14,22 +14,22 @@
 
 <p align="center">
   <a href="https://github.com/zengyincen/notion-widget-box/actions/workflows/deploy-pages.yml"><img src="https://img.shields.io/github/actions/workflow/status/zengyincen/notion-widget-box/deploy-pages.yml?branch=main&amp;style=flat-square&amp;label=Pages" alt="GitHub Pages status" /></a>
-  <a href="https://notion-widget-box-sync.ethanz.workers.dev/health"><img src="https://img.shields.io/website?url=https%3A%2F%2Fnotion-widget-box-sync.ethanz.workers.dev%2Fhealth&amp;style=flat-square&amp;label=Cloud%20Sync" alt="Cloud sync status" /></a>
+  <a href="https://nwb.imnotfound.eu.org/health"><img src="https://img.shields.io/website?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fhealth&amp;style=flat-square&amp;label=Cloud%20Sync" alt="Cloud sync status" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/github/license/zengyincen/notion-widget-box?style=flat-square" alt="MIT License" /></a>
   <a href="https://github.com/zengyincen/notion-widget-box/stargazers"><img src="https://img.shields.io/github/stars/zengyincen/notion-widget-box?style=flat-square" alt="GitHub Stars" /></a>
   <a href="https://github.com/zengyincen/notion-widget-box/commits/main"><img src="https://img.shields.io/github/last-commit/zengyincen/notion-widget-box?style=flat-square" alt="Last commit" /></a>
 </p>
 
 <p align="center">
-  <a href="https://zengyincen.github.io/notion-widget-box/"><strong>挑选我的第一个组件</strong></a>
+  <a href="https://widget.imnotfound.eu.org/"><strong>挑选我的第一个组件</strong></a>
   ·
-  <a href="https://zengyincen.github.io/notion-widget-box/?category=feature-pet">领养桌面宠物</a>
+  <a href="https://widget.imnotfound.eu.org/?category=feature-pet">领养桌面宠物</a>
   ·
   <a href="./docs/NOTION-DATABASE.zh-CN.md">连接公开 Notion 数据</a>
 </p>
 
 <p align="center">
-  <a href="https://zengyincen.github.io/notion-widget-box/">
+  <a href="https://widget.imnotfound.eu.org/">
     <img src="./assets/readme-banner.svg" width="100%" alt="Notion Widget Box hero banner" />
   </a>
 </p>
@@ -56,7 +56,7 @@ Notion Widget Box 是我们为 Notion 用户提供的在线小组件服务。你
 
 ## 三步放进 Notion
 
-1. 打开[在线组件库](https://zengyincen.github.io/notion-widget-box/)，搜索或筛选喜欢的组件。
+1. 打开[在线组件库](https://widget.imnotfound.eu.org/)，搜索或筛选喜欢的组件。
 2. 在实时预览中调整内容、颜色、字体、主题和尺寸，然后点击“复制链接”。
 3. 在 Notion 输入 `/embed`，粘贴链接并确认。
 
@@ -144,8 +144,8 @@ Notion Widget Box 是我们为 Notion 用户提供的在线小组件服务。你
 
 ### 架构
 
-- GitHub Pages：组件市场、定制器与统一的 `widget.html` 嵌入入口。
-- Cloudflare Worker：公共 API、Notion 公开数据聚合与 60 秒缓存。
+- `widget.imnotfound.eu.org`：由 Cloudflare 代理的组件市场、定制器与统一 `widget.html` 嵌入入口。
+- `nwb.imnotfound.eu.org`：Cloudflare Worker 公共 API、Notion 公开数据聚合与 60 秒缓存。
 - Durable Objects：按随机 `petId` 分片，每只宠物一个强一致 SQLite 对象。
 - 管理员重置：通过 Worker Secret `RESET_SECRET` 保护，不进入浏览器代码或链接。
 

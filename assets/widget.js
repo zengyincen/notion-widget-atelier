@@ -5,6 +5,7 @@
   const { components, themes } = window.WIDGET_BOX;
   const fontCatalog = window.WIDGET_FONTS;
   const managedService = window.WIDGET_BOX_SERVICE;
+  const publicBase = (managedService?.publicBase || location.origin).replace(/\/$/, "");
   const type = params.get("type") || "digital-clock";
   const meta = components.find((item) => item.id === type) || components[0];
   const theme = themes.find((item) => item.id === (params.get("theme") || "notion")) || themes[0];
@@ -273,7 +274,7 @@
   function safePetId(value){const raw=String(value||"pet");if(/^[a-zA-Z0-9_-]{1,64}$/.test(raw))return raw;let a=2166136261,b=2246822507;for(const char of raw){const code=char.codePointAt(0);a=Math.imul(a^code,16777619);b=Math.imul(b^code,3266489909);}return `legacy-${(a>>>0).toString(16).padStart(8,"0")}${(b>>>0).toString(16).padStart(8,"0")}`;}
   async function renderPet(){
     const mode=p("syncMode","managed")==="local"?"local":"managed",sync=(managedService?.apiBase||"").replace(/\/$/,""),petId=safePetId(p("petId",p("petName","Mochi")));let lastRevision=-1;
-    const localAction=(action)=>{const url=new URL("action.html",location.href);url.searchParams.set("pet",petId);url.searchParams.set("do",action);return url.toString();};
+    const localAction=(action)=>{const url=new URL("action.html",`${publicBase}/`);url.searchParams.set("pet",petId);url.searchParams.set("do",action);return url.toString();};
     const draw=(state,label,actionBuilder)=>{
       const mood=petMood(state),face=petFace(state,mood.id),food=Math.round(state.food),water=Math.round(state.water),love=Math.round(state.love);
       const waitLabel=seconds=>seconds>=3600?`${Math.ceil(seconds/3600)} 小时后`:`${Math.max(1,Math.ceil(seconds/60))} 分钟后`,feedWait=Number(state.cooldowns?.feed)||0,waterWait=Number(state.cooldowns?.water)||0;
