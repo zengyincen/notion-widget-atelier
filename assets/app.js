@@ -262,6 +262,11 @@
       font: "system", locale: "zh-CN", timezone: "Asia/Shanghai",
       ...(saved || {})
     };
+    if (component.id === "pet-companion") {
+      delete state.config.syncMode;
+      delete state.config.syncUrl;
+      delete state.config.githubRepo;
+    }
     if (!saved || forceDefault) Object.assign(state.config, { theme: theme.id, layout: layout.id, bg: theme.bg, surface: theme.surface, text: theme.text, accent: theme.accent });
     $("#selectedIcon").textContent = component.icon;
     $("#selectedCategory").textContent = categoryMap[component.category].label;
@@ -380,8 +385,10 @@
     const url = new URL("widget.html", location.href);
     url.searchParams.set("type", state.selected.component.id);
     Object.entries(state.config).forEach(([key, value]) => {
+      if (["syncMode", "syncUrl", "githubRepo"].includes(key)) return;
       if (value !== "" && value !== undefined && value !== null) url.searchParams.set(key, String(value));
     });
+    if (state.selected.component.id === "pet-companion" && state.petNeedsAdoption) url.searchParams.set("syncMode", "local");
     return url.toString();
   }
 

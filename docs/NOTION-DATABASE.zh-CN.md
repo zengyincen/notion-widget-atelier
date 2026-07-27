@@ -31,7 +31,7 @@ lets(
 widget.html?type=database-progress&value=42&max=100&label=项目完成度
 ```
 
-Notion 不会自动把每行数据库属性插值到 iframe URL。本项目提供零 Token 的公开页面连接器：将数据库页面 Publish 后，在定制器点击“安全连接 Notion 数据库”，选择属性映射即可。Worker 会读取公开数据库并返回聚合后的 `{ value, max }`。
+Notion 不会自动把每行数据库属性插值到 iframe URL。我们提供零 Token 的公开页面连接器：将数据库页面 Publish 后，在定制器点击“安全连接 Notion 数据库”，选择属性映射即可。托管服务会读取公开数据库并返回聚合后的 `{ value, max }`。
 
 ## 热力图数据格式
 
@@ -49,9 +49,9 @@ Notion 不会自动把每行数据库属性插值到 iframe URL。本项目提�
 
 1. 在 Notion 打开数据库原始页面（不要使用仅链接视图）。
 2. Share → Publish，并用匿名浏览器确认表格和行可见。
-3. 部署 `worker/`，取得 `workers.dev` 地址。
-4. 打开 `connect.html`，输入 Worker 地址与公开 Notion URL。
-5. 读取列结构，选择聚合列并生成数据 URL。
+3. 在组件定制器点击“安全连接 Notion 数据库”。
+4. 粘贴公开 Notion URL，读取列结构。
+5. 选择聚合列并生成数据 URL；无需自行部署 Worker。
 
 公开连接器使用 Notion 网页自身的未公开公共页面接口，不是官方 API，因此存在兼容性风险。项目会缓存聚合结果 60 秒，降低请求频率；若 Notion 调整内部接口，仍可回退到手动 `日期:数值` 数据或原生 Formula。
 
@@ -59,5 +59,5 @@ Notion 不会自动把每行数据库属性插值到 iframe URL。本项目提�
 
 - 此连接方式完全不需要 Notion Internal Integration Token。
 - 发布前应移除邮箱、客户资料、内部项目等敏感字段。Notion 公共页面本身对所有拿到链接的人可见。
-- Worker 只返回列名/类型和聚合值，不代理完整原始行。
+- 我们的托管服务只返回列名/类型和聚合值，不代理完整原始行。
 - 私有数据库不适用此模式；不要尝试使用登录 Cookie 或其他私有凭证绕过权限。

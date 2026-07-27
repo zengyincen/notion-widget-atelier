@@ -14,16 +14,15 @@
     <header class="top"><span class="brand">◧ &nbsp; Notion Widget Box</span><a href="./">← 返回组件库</a></header>
     <main class="wrap">
       <section class="intro">
-        <p class="eyebrow">ZERO TOKEN · PUBLIC DATA</p>
+        <p class="eyebrow">PUBLISH · CONNECT · EMBED</p>
         <h1>把公开数据库<br /><em>变成组件数据。</em></h1>
-        <p>无需 Integration Token。连接器只读取你主动发布的 Notion 数据库，并只返回聚合后的进度或按日期统计值。</p>
+        <p>无需 Integration Token，也无需部署任何服务。你只要发布数据库页面，我们会读取列结构，并只把聚合后的进度或日期统计值交给组件。</p>
         <div class="steps"><div class="step"><i>1</i><span><b>发布数据库页面</b>Notion 右上角 Share → Publish，确认匿名窗口可以打开。</span></div><div class="step"><i>2</i><span><b>测试公开链接</b>连接器读取列名与类型，不会取得私有页面。</span></div><div class="step"><i>3</i><span><b>选择聚合方式</b>映射数值/日期列，生成可直接用于组件的数据 URL。</span></div></div>
         <div class="notice">公开页面可能连同列名与行内容对任何拿到链接的人可见。请勿发布含姓名、邮箱、客户资料等敏感数据的数据库。</div>
       </section>
       <section class="panel">
-        <h2>公开数据连接</h2><p>先部署项目自带 Worker，再填写其地址。</p>
+        <h2>连接你的公开数据</h2><p>数据读取服务已由我们托管，粘贴 Notion 公开链接即可。</p>
         <form id="connectForm">
-          <label class="field"><span>公开读取 Worker 地址</span><input id="workerUrl" required placeholder="https://notion-widget-box-sync.xxx.workers.dev" /></label>
           <label class="field"><span>公开 Notion 数据库链接</span><input id="notionUrl" type="url" required placeholder="https://your-space.notion.site/…" /></label>
           <div class="row"><label class="field"><span>组件用途</span><select id="mode"><option value="progress">进度条</option><option value="heatmap">热力图</option></select></label><label class="field"><span>组件标题</span><input id="label" value="Notion 数据进度" maxlength="40" /></label></div>
           <button class="button secondary" id="inspectButton" type="submit">读取公开列结构</button>
@@ -35,11 +34,87 @@
           <button class="button" id="generateButton" type="button">生成组件数据 URL</button>
         </section>
         <section class="result" id="result"><strong>连接成功</strong><textarea id="dataUrl" rows="4" readonly></textarea><button class="button" id="useButton" type="button">填入组件并返回</button></section>
-        <p class="privacy">技术说明：使用 Notion 的未公开公共页面接口兼容读取，不需要 Token，但接口可能随 Notion 改版。Worker 仅返回聚合结果并缓存 60 秒；手动数据始终可作为兜底。</p>
+        <p class="privacy">隐私说明：我们不索取 Notion Token，也不返回完整数据行；服务只返回组件所需的列结构与聚合结果，并缓存 60 秒。请勿发布含个人或敏感信息的数据库。</p>
       </section>
     </main>
+    <script src="assets/service.js"></script>
     <script>
-      (()=>{const $=s=>document.querySelector(s),form=$("#connectForm"),status=$("#status"),mapping=$("#mapping"),result=$("#result");let columns=[];$("#workerUrl").value=localStorage.getItem("widgetBox.publicNotionWorker")||"";const show=(text,error=false)=>{status.textContent=text;status.className=`status show ${error?"error":""}`};const baseUrl=()=>$("#workerUrl").value.trim().replace(/\/$/,"");const endpoint=(mode)=>{const url=new URL(`${baseUrl()}/notion/public`);url.searchParams.set("page",$("#notionUrl").value.trim());url.searchParams.set("mode",mode);return url};const fill=(select,items,blank=false)=>{select.replaceChildren();if(blank)select.add(new Option("不选",""));items.forEach(item=>select.add(new Option(`${item.name} · ${item.type}`,item.id)));};form.onsubmit=async e=>{e.preventDefault();mapping.classList.remove("show");result.classList.remove("show");show("正在读取公开数据库结构…");try{const worker=baseUrl();if(!/^https?:\/\//.test(worker))throw new Error("请填写有效 Worker 地址");localStorage.setItem("widgetBox.publicNotionWorker",worker);const response=await fetch(endpoint("schema"));const data=await response.json();if(!response.ok)throw new Error(data.error||"读取失败");columns=data.columns||[];if(!columns.length)throw new Error("没有找到可读取的数据库列");fill($("#currentColumn"),columns.filter(x=>["number","formula","rollup","checkbox"].includes(x.type)));fill($("#maxColumn"),columns.filter(x=>["number","formula","rollup"].includes(x.type)),true);fill($("#dateColumn"),columns.filter(x=>["date","created_time","last_edited_time"].includes(x.type)));fill($("#valueColumn"),columns.filter(x=>["number","formula","rollup","checkbox"].includes(x.type)),true);show(`已读取「${data.title}」：${data.rowCount} 行、${columns.length} 列。`);mapping.classList.add("show");syncMode();}catch(error){show(error.message||"无法读取，请确认页面已 Publish。",true)}};function syncMode(){const heat=$("#mode").value==="heatmap";$("#progressFields").hidden=heat;$("#heatmapFields").hidden=!heat;}$("#mode").onchange=syncMode;$("#generateButton").onclick=()=>{const mode=$("#mode").value,url=endpoint(mode);url.searchParams.set("label",$("#label").value.trim());if(mode==="progress"){url.searchParams.set("current",$("#currentColumn").value);if($("#maxColumn").value)url.searchParams.set("max",$("#maxColumn").value);}else{url.searchParams.set("date",$("#dateColumn").value);if($("#valueColumn").value)url.searchParams.set("value",$("#valueColumn").value);}$("#dataUrl").value=url.toString();result.classList.add("show");};$("#useButton").onclick=async()=>{const value=$("#dataUrl").value;try{await navigator.clipboard.writeText(value)}catch{}if(window.opener){window.opener.postMessage({type:"notion-widget-box-data-url",value},location.origin);window.close();}else{$("#useButton").textContent="已复制，请粘贴到组件定制器";}};})();
+      (() => {
+        const $ = (selector) => document.querySelector(selector);
+        const form = $("#connectForm");
+        const status = $("#status");
+        const mapping = $("#mapping");
+        const result = $("#result");
+        const serviceBase = window.WIDGET_BOX_SERVICE.apiBase.replace(/\/$/, "");
+        let columns = [];
+        const show = (text, error = false) => {
+          status.textContent = text;
+          status.className = `status show ${error ? "error" : ""}`;
+        };
+        const endpoint = (mode) => {
+          const url = new URL(`${serviceBase}/notion/public`);
+          url.searchParams.set("page", $("#notionUrl").value.trim());
+          url.searchParams.set("mode", mode);
+          return url;
+        };
+        const fill = (select, items, blank = false) => {
+          select.replaceChildren();
+          if (blank) select.add(new Option("不选", ""));
+          items.forEach((item) => select.add(new Option(`${item.name} · ${item.type}`, item.id)));
+        };
+        form.onsubmit = async (event) => {
+          event.preventDefault();
+          mapping.classList.remove("show");
+          result.classList.remove("show");
+          show("正在通过托管服务读取公开数据库结构…");
+          try {
+            const response = await fetch(endpoint("schema"));
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "读取失败");
+            columns = data.columns || [];
+            if (!columns.length) throw new Error("没有找到可读取的数据库列");
+            fill($("#currentColumn"), columns.filter((item) => ["number", "formula", "rollup", "checkbox"].includes(item.type)));
+            fill($("#maxColumn"), columns.filter((item) => ["number", "formula", "rollup"].includes(item.type)), true);
+            fill($("#dateColumn"), columns.filter((item) => ["date", "created_time", "last_edited_time"].includes(item.type)));
+            fill($("#valueColumn"), columns.filter((item) => ["number", "formula", "rollup", "checkbox"].includes(item.type)), true);
+            show(`已读取「${data.title}」：${data.rowCount} 行、${columns.length} 列。`);
+            mapping.classList.add("show");
+            syncMode();
+          } catch (error) {
+            show(error.message || "无法读取，请确认页面已发布并允许公开访问。", true);
+          }
+        };
+        function syncMode() {
+          const heatmap = $("#mode").value === "heatmap";
+          $("#progressFields").hidden = heatmap;
+          $("#heatmapFields").hidden = !heatmap;
+        }
+        $("#mode").onchange = syncMode;
+        $("#generateButton").onclick = () => {
+          const mode = $("#mode").value;
+          const url = endpoint(mode);
+          url.searchParams.set("label", $("#label").value.trim());
+          if (mode === "progress") {
+            url.searchParams.set("current", $("#currentColumn").value);
+            if ($("#maxColumn").value) url.searchParams.set("max", $("#maxColumn").value);
+          } else {
+            url.searchParams.set("date", $("#dateColumn").value);
+            if ($("#valueColumn").value) url.searchParams.set("value", $("#valueColumn").value);
+          }
+          $("#dataUrl").value = url.toString();
+          result.classList.add("show");
+        };
+        $("#useButton").onclick = async () => {
+          const value = $("#dataUrl").value;
+          try { await navigator.clipboard.writeText(value); } catch {}
+          if (window.opener) {
+            window.opener.postMessage({ type: "notion-widget-box-data-url", value }, location.origin);
+            window.close();
+          } else {
+            $("#useButton").textContent = "已复制，请粘贴到组件定制器";
+          }
+        };
+      })();
     </script>
   </body>
 </html>

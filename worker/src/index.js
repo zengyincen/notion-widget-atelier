@@ -2,6 +2,8 @@ import { DurableObject } from "cloudflare:workers";
 
 const DEFAULT_STATE = Object.freeze({ food: 82, water: 76, love: 88 });
 const ACTIONS = new Set(["feed", "water", "pet"]);
+const CARE_COOLDOWN_MS = 2 * 60 * 60 * 1000;
+const ACTION_THROTTLE_MS = 400;
 
 export class PetState extends DurableObject {
   constructor(ctx, env) {
@@ -14,15 +16,22 @@ export class PetState extends DurableObject {
           water REAL NOT NULL,
           love REAL NOT NULL,
           updated_at INTEGER NOT NULL,
-          last_action_at INTEGER NOT NULL DEFAULT 0
+          last_action_at INTEGER NOT NULL DEFAULT 0,
+          last_feed_at INTEGER NOT NULL DEFAULT 0,
+          last_water_at INTEGER NOT NULL DEFAULT 0,
+          revision INTEGER NOT NULL DEFAULT 0
         )
       `);
+      const columns = new Set(this.ctx.storage.sql.exec("PRAGMA table_info(pet_state)").toArray().map((column) => column.name));
+      if (!columns.has("last_feed_at")) this.ctx.storage.sql.exec("ALTER TABLE pet_state ADD COLUMN last_feed_at INTEGER NOT NULL DEFAULT 0");
+      if (!columns.has("last_water_at")) this.ctx.storage.sql.exec("ALTER TABLE pet_state ADD COLUMN last_water_at INTEGER NOT NULL DEFAULT 0");
+      if (!columns.has("revision")) this.ctx.storage.sql.exec("ALTER TABLE pet_state ADD COLUMN revision INTEGER NOT NULL DEFAULT 0");
     });
   }
 
   readStored() {
     return this.ctx.storage.sql.exec(
-      "SELECT food, water, love, updated_at AS updatedAt, last_action_at AS lastActionAt FROM pet_state WHERE singleton = 1"
+      "SELECT food, water, love, updated_at AS updatedAt, last_action_at AS lastActionAt, last_feed_at AS lastFeedAt, last_water_at AS lastWaterAt, revision FROM pet_state WHERE singleton = 1"
     ).toArray()[0] ?? null;
   }
 
@@ -34,6 +43,9 @@ export class PetState extends DurableObject {
       love: Math.max(0, state.love - hours * 1.7),
       updatedAt: now,
       lastActionAt: state.lastActionAt ?? 0,
+      lastFeedAt: state.lastFeedAt ?? 0,
+      lastWaterAt: state.lastWaterAt ?? 0,
+      revision: state.revision ?? 0,
     };
   }
 
@@ -44,37 +56,75 @@ export class PetState extends DurableObject {
       "INSERT INTO pet_state (singleton, food, water, love, updated_at) VALUES (1, ?, ?, ?, ?)",
       DEFAULT_STATE.food, DEFAULT_STATE.water, DEFAULT_STATE.love, now,
     );
-    return { ...DEFAULT_STATE, updatedAt: now, lastActionAt: 0 };
+    return { ...DEFAULT_STATE, updatedAt: now, lastActionAt: 0, lastFeedAt: 0, lastWaterAt: 0, revision: 0 };
   }
 
   async getState() {
     const state = this.withDecay(this.ensureState());
-    return { ...state, mood: Math.min(state.food, state.water, state.love) < 35 ? "needs-care" : "happy" };
+    return this.publicState(state);
+  }
+
+  publicState(state, extra = {}) {
+    const minimum = Math.min(state.food, state.water, state.love);
+    const mood = minimum < 35 ? "needs-care" : minimum < 70 ? "recovering" : minimum >= 88 ? "delighted" : "happy";
+    return {
+      food: state.food,
+      water: state.water,
+      love: state.love,
+      updated: state.updatedAt,
+      revision: state.revision ?? 0,
+      mood,
+      cooldowns: {
+        feed: Math.max(0, Math.ceil((CARE_COOLDOWN_MS - (Date.now() - (state.lastFeedAt ?? 0))) / 1000)),
+        water: Math.max(0, Math.ceil((CARE_COOLDOWN_MS - (Date.now() - (state.lastWaterAt ?? 0))) / 1000)),
+      },
+      ...extra,
+    };
   }
 
   async act(action) {
     if (!ACTIONS.has(action)) throw new Error("Unsupported action");
     const now = Date.now();
     const state = this.withDecay(this.ensureState(now), now);
-    if (now - state.lastActionAt < 500) return { ...state, throttled: true };
-    if (action === "feed") state.food = 100;
-    if (action === "water") state.water = 100;
-    if (action === "pet") state.love = 100;
+    if (now - state.lastActionAt < ACTION_THROTTLE_MS) {
+      return this.publicState(state, { action, accepted: false, throttled: true, message: "慢一点，它正在享受刚才的照顾。" });
+    }
+    const lastCareAt = action === "feed" ? state.lastFeedAt : action === "water" ? state.lastWaterAt : 0;
+    if (lastCareAt && now - lastCareAt < CARE_COOLDOWN_MS) {
+      const retryAfterSeconds = Math.ceil((CARE_COOLDOWN_MS - (now - lastCareAt)) / 1000);
+      return this.publicState(state, {
+        action,
+        accepted: false,
+        cooldown: true,
+        retryAfterSeconds,
+        message: action === "feed" ? "两小时内已经喂过啦。" : "两小时内已经喂过水啦。",
+      });
+    }
+    if (action === "feed") {
+      state.food = Math.min(100, state.food + 34);
+      state.lastFeedAt = now;
+    }
+    if (action === "water") {
+      state.water = Math.min(100, state.water + 40);
+      state.lastWaterAt = now;
+    }
+    if (action === "pet") state.love = Math.min(100, state.love + 12);
+    state.revision = (state.revision ?? 0) + 1;
     this.ctx.storage.sql.exec(
-      "UPDATE pet_state SET food = ?, water = ?, love = ?, updated_at = ?, last_action_at = ? WHERE singleton = 1",
-      state.food, state.water, state.love, now, now,
+      "UPDATE pet_state SET food = ?, water = ?, love = ?, updated_at = ?, last_action_at = ?, last_feed_at = ?, last_water_at = ?, revision = ? WHERE singleton = 1",
+      state.food, state.water, state.love, now, now, state.lastFeedAt, state.lastWaterAt, state.revision,
     );
-    return { ...state, lastActionAt: now, action };
+    return this.publicState({ ...state, updatedAt: now, lastActionAt: now }, { action, accepted: true, message: action === "feed" ? "已经吃到食物啦。" : action === "water" ? "已经喝到清水啦。" : "好舒服，它很喜欢你的抚摸。" });
   }
 
   async reset(secret, expectedSecret) {
     if (!expectedSecret || secret !== expectedSecret) throw new Error("Unauthorized");
     const now = Date.now();
     this.ctx.storage.sql.exec(
-      "INSERT OR REPLACE INTO pet_state (singleton, food, water, love, updated_at, last_action_at) VALUES (1, ?, ?, ?, ?, ?)",
+      "INSERT OR REPLACE INTO pet_state (singleton, food, water, love, updated_at, last_action_at, last_feed_at, last_water_at, revision) VALUES (1, ?, ?, ?, ?, ?, 0, 0, 0)",
       DEFAULT_STATE.food, DEFAULT_STATE.water, DEFAULT_STATE.love, now, now,
     );
-    return { ...DEFAULT_STATE, updatedAt: now };
+    return this.publicState({ ...DEFAULT_STATE, updatedAt: now, lastActionAt: now, lastFeedAt: 0, lastWaterAt: 0, revision: 0 });
   }
 }
 
@@ -93,9 +143,20 @@ function json(data, status = 200) {
 }
 
 function actionPage(action, state) {
-  const labels = { feed: "已经吃饱啦！", water: "喝到清水啦！", pet: "感到很安心！" };
-  const title = labels[action] ?? "状态已更新";
-  return `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="robots" content="noindex"><title>${title}</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f3f2ee;color:#20201e;font-family:-apple-system,BlinkMacSystemFont,sans-serif}.c{width:min(82vw,320px);padding:36px;border-radius:28px;background:white;text-align:center;box-shadow:0 24px 70px #0002}.f{font:30px monospace;animation:b 1s infinite alternate}h1{font-size:20px}p{font-size:12px;color:#777}button{border:0;border-radius:11px;background:#20201e;color:white;padding:10px 16px}@keyframes b{to{transform:translateY(-5px)}}</style><main class="c"><div class="f">/ᐠ˵- ᴗ -˵ᐟ\\</div><h1>${title}</h1><p>状态已同步到所有嵌入页面。</p><button onclick="window.close();history.back()">关闭</button></main><script>setTimeout(()=>{window.close();if(history.length>1)history.back()},1200)<\/script></html>`;
+  const labels = { feed: "已投喂", water: "已喂水", pet: "已抚摸" };
+  const title = state.accepted ? labels[action] : state.message || "暂时不用再照顾";
+  const note = state.accepted ? "状态已同步到所有嵌入页面。" : state.cooldown ? "每两小时可喂食、喂水各一次。" : "稍等一下再试试。";
+  return `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="robots" content="noindex"><title>${title}</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f3f2ee;color:#20201e;font-family:-apple-system,BlinkMacSystemFont,sans-serif}.c{width:min(82vw,320px);padding:36px;border-radius:22px;background:white;text-align:center;box-shadow:0 24px 70px #0002}.f{font:30px monospace;animation:b 1s infinite alternate}h1{font-size:20px}p{font-size:12px;color:#777}button{border:0;border-radius:11px;background:#20201e;color:white;padding:10px 16px}@keyframes b{to{transform:translateY(-5px)}}</style><main class="c"><div class="f">/ᐠ˵- ᴗ -˵ᐟ\\</div><h1>${title}</h1><p>${note}</p><button onclick="window.close();history.back()">关闭</button></main><script>setTimeout(()=>{window.close();if(history.length>1)history.back()},1500)<\/script></html>`;
+}
+
+function actionPageHeaders() {
+  return {
+    ...corsHeaders(),
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'",
+    "Referrer-Policy": "no-referrer",
+    "X-Frame-Options": "DENY",
+  };
 }
 
 function unwrapRecord(record) {
@@ -222,6 +283,10 @@ export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders() });
     const url = new URL(request.url);
+    if (url.pathname === "/" || url.pathname === "/health") {
+      if (request.method !== "GET") return json({ error: "GET required" }, 405);
+      return json({ ok: true, service: "Notion Widget Box Cloud", storage: "Durable Objects", version: 2 });
+    }
     if (url.pathname === "/notion/public") {
       if (request.method !== "GET") return json({ error: "GET required" }, 405);
       try {
@@ -242,10 +307,11 @@ export default {
     const stub = env.PETS.getByName(petId);
     try {
       if (action) {
+        if (!["GET", "POST"].includes(request.method)) return json({ error: "GET or POST required" }, 405);
         const state = await stub.act(action);
         const wantsHtml = request.method === "GET" && !request.headers.get("accept")?.includes("application/json");
         return wantsHtml
-          ? new Response(actionPage(action, state), { headers: { ...corsHeaders(), "Content-Type": "text/html; charset=utf-8" } })
+          ? new Response(actionPage(action, state), { headers: actionPageHeaders() })
           : json(state);
       }
       if (url.pathname.endsWith("/reset")) {
@@ -253,6 +319,7 @@ export default {
         const secret = request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ?? "";
         return json(await stub.reset(secret, env.RESET_SECRET));
       }
+      if (request.method !== "GET") return json({ error: "GET required" }, 405);
       return json(await stub.getState());
     } catch (error) {
       const unauthorized = error instanceof Error && error.message === "Unauthorized";

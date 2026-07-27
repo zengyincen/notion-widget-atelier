@@ -1,47 +1,63 @@
-# 动态同步与公开 Notion 数据连接（可选）
+# Notion Widget Box 托管服务运维说明
 
-主站仍部署在 GitHub Pages。这个 Worker 提供两项能力：
+> 本文档面向服务管理员。终端用户无需部署 Worker、填写服务地址或接触任何密钥。
 
-- 为动态宠物保存 `food / water / love`；每个 `petId` 对应一个强一致 Durable Object。
-- 零 Token 读取用户主动 Publish 的 Notion 数据库，返回进度或热力图聚合值，并缓存 60 秒。
+生产服务：`https://notion-widget-box-sync.ethanz.workers.dev`
 
-## 部署
+## 服务职责
+
+- 动态宠物：每个随机 `petId` 对应一个独立的 SQLite Durable Object，保存饱腹、水分、安心、冷却时间与状态版本。
+- 公开 Notion 数据：读取用户主动 Publish 的数据库，返回列结构、进度或热力图聚合值，并缓存 60 秒。
+- 管理员接口：可使用 Worker Secret 保护的重置接口恢复指定宠物状态。
+
+喂食与喂水分别限制为每两小时一次；抚摸可重复触发，并通过短间隔节流避免意外连击。任何密钥都不得进入 `assets/service.js`、组件 URL 或浏览器代码。
+
+## 部署与验证
 
 ```bash
 cd worker
 npm install
-npx wrangler login
-npx wrangler secret put RESET_SECRET
+npx wrangler whoami
+npm run check
 npm run deploy
 ```
 
-部署后，动态宠物可在组件定制器中填写：
+部署后验证健康状态：
 
-- 同步地址：`https://notion-widget-box-sync.<你的子域>.workers.dev`
-- 宠物 ID：自定义一个不容易撞名的 ID，例如 `shorouk-mochi-2026`
+```bash
+curl https://notion-widget-box-sync.ethanz.workers.dev/health
+```
 
-恒久嵌入链接仍是 GitHub Pages 的 `widget.html?...`。组件每两秒读取 Worker；“喂食 / 喂水 / 抚摸”链接直接写入同一个 Durable Object。
+若 Worker 地址发生变化，请同步更新 `assets/service.js`，再发布 GitHub Pages。
 
-重置宠物（仅管理员）：
+## 管理员重置
+
+首次启用重置功能时，通过交互式命令写入 Secret：
+
+```bash
+npx wrangler secret put RESET_SECRET
+```
+
+重置指定宠物：
 
 ```bash
 curl -X POST \
   -H "Authorization: Bearer <RESET_SECRET>" \
-  "https://notion-widget-box-sync.<你的子域>.workers.dev/pet/<PET_ID>/reset"
+  "https://notion-widget-box-sync.ethanz.workers.dev/pet/<PET_ID>/reset"
 ```
 
-不要把 `RESET_SECRET` 写进组件 URL、仓库或浏览器代码。
-
-## 公开 Notion 数据库
-
-打开主站的 `connect.html`，填写 Worker 地址与已 Publish 的 Notion 数据库链接。这个功能不需要任何 Notion Token。
-
-公开读取接口示例：
+## 公开接口
 
 ```text
+GET /health
+GET /pet/<PET_ID>
+GET /pet/<PET_ID>/action/feed
+GET /pet/<PET_ID>/action/water
+GET /pet/<PET_ID>/action/pet
+POST /pet/<PET_ID>/reset
 GET /notion/public?page=<PUBLIC_NOTION_URL>&mode=schema
 GET /notion/public?page=<PUBLIC_NOTION_URL>&mode=progress&current=<PROPERTY_ID>&max=<PROPERTY_ID>
 GET /notion/public?page=<PUBLIC_NOTION_URL>&mode=heatmap&date=<PROPERTY_ID>&value=<PROPERTY_ID>
 ```
 
-该功能使用 Notion 网页的未公开公共页面接口，可能因 Notion 改版失效。它只接受 `notion.so` / `notion.site` 公共链接，只向客户端返回列结构或聚合数据，不返回完整行。
+公开 Notion 功能依赖 Notion 网页的公共页面兼容接口，可能随 Notion 改版而变化。接口只接受 `notion.so` / `notion.site` 公开链接，只返回列结构或聚合结果，不返回完整行。
