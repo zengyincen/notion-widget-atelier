@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="720" viewBox="0 0 1600 720" role="img" aria-labelledby="title description">
+  <title id="title">Notion Widget Box</title>
+  <desc id="description">A gallery of customizable music, progress, heatmap and pet widgets.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7f6f2"/>
+      <stop offset="1" stop-color="#eeece6"/>
+    </linearGradient>
+    <linearGradient id="cover" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb196"/>
+      <stop offset=".52" stop-color="#8eaef3"/>
+      <stop offset="1" stop-color="#c7b5ef"/>
+    </linearGradient>
+    <linearGradient id="progress" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6f93ee"/>
+      <stop offset="1" stop-color="#9d7ce9"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#b8c9ff" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#b8c9ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#302d27" flood-opacity=".13"/>
+    </filter>
+    <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0V34" fill="none" stroke="#262522" stroke-opacity=".035"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="720" rx="42" fill="url(#background)"/>
+  <rect width="1600" height="720" rx="42" fill="url(#grid)"/>
+  <circle cx="1340" cy="130" r="310" fill="url(#glow)"/>
+  <circle cx="765" cy="670" r="240" fill="#ffd0ba" opacity=".2"/>
+
+  <g transform="translate(88 86)">
+    <rect width="58" height="58" rx="17" fill="#20201e"/>
+    <rect x="16" y="30" width="6" height="15" rx="3" fill="#fff"/>
+    <rect x="26" y="21" width="6" height="24" rx="3" fill="#fff"/>
+    <rect x="36" y="12" width="6" height="33" rx="3" fill="#fff"/>
+    <text x="0" y="104" fill="#20201e" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="18" font-weight="700" letter-spacing="4">OPEN SOURCE · GITHUB PAGES</text>
+    <text x="0" y="190" fill="#20201e" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="72" font-weight="800" letter-spacing="-4">Notion Widget</text>
+    <text x="0" y="266" fill="#20201e" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="72" font-weight="800" letter-spacing="-4">Box</text>
+    <text x="0" y="320" fill="#77746e" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="25">让每一个 Notion 页面，都有自己的节奏。</text>
+
+    <g transform="translate(0 366)" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="18" font-weight="700">
+      <rect width="152" height="48" rx="24" fill="#20201e"/>
+      <text x="76" y="31" fill="#fff" text-anchor="middle">85 个引擎</text>
+      <rect x="164" width="176" height="48" rx="24" fill="#fff" stroke="#dedbd4"/>
+      <text x="252" y="31" fill="#45433f" text-anchor="middle">1,530 个模板</text>
+      <rect x="352" width="166" height="48" rx="24" fill="#fff" stroke="#dedbd4"/>
+      <text x="435" y="31" fill="#45433f" text-anchor="middle">603 款字体</text>
+    </g>
+
+    <g transform="translate(0 458)" fill="#8b8882" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="17">
+      <text y="0">✓ 无需构建</text>
+      <text x="150" y="0">✓ 免费部署</text>
+      <text x="300" y="0">✓ 永久嵌入链接</text>
+    </g>
+  </g>
+
+  <g filter="url(#shadow)">
+    <g transform="translate(800 70)">
+      <rect width="700" height="244" rx="30" fill="#fff"/>
+      <rect x="30" y="30" width="184" height="184" rx="27" fill="url(#cover)"/>
+      <circle cx="122" cy="122" r="59" fill="#171717" opacity=".9"/>
+      <circle cx="122" cy="122" r="22" fill="#f4d7bc"/>
+      <circle cx="122" cy="122" r="5" fill="#171717"/>
+      <text x="248" y="54" fill="#8b8882" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="700" letter-spacing="3">NOW PLAYING</text>
+      <text x="248" y="95" fill="#20201e" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="34" font-weight="750">Midnight Atelier</text>
+      <text x="248" y="123" fill="#99958f" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="15">Open Audio Demo</text>
+      <g transform="translate(248 146)" fill="#6f93ee">
+        <rect width="5" height="24" rx="2.5"/><rect x="11" y="8" width="5" height="16" rx="2.5"/><rect x="22" y="2" width="5" height="22" rx="2.5"/><rect x="33" y="11" width="5" height="13" rx="2.5"/><rect x="44" y="5" width="5" height="19" rx="2.5"/><rect x="55" width="5" height="24" rx="2.5"/><rect x="66" y="9" width="5" height="15" rx="2.5"/><rect x="77" y="3" width="5" height="21" rx="2.5"/>
+      </g>
+      <circle cx="258" cy="200" r="17" fill="#20201e"/>
+      <path d="m254 193 11 7-11 7Z" fill="#fff"/>
+      <rect x="290" y="197" width="340" height="6" rx="3" fill="#e8e6e1"/>
+      <rect x="290" y="197" width="205" height="6" rx="3" fill="#6f93ee"/>
+      <circle cx="495" cy="200" r="7" fill="#6f93ee"/>
+    </g>
+
+    <g transform="translate(800 344)">
+      <rect width="322" height="302" rx="30" fill="#fff"/>
+      <text x="28" y="46" fill="#9b9891" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="700" letter-spacing="2">WEEKLY GOAL</text>
+      <text x="28" y="105" fill="#20201e" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="54" font-weight="780">72%</text>
+      <rect x="28" y="130" width="266" height="10" rx="5" fill="#eceae5"/>
+      <rect x="28" y="130" width="192" height="10" rx="5" fill="url(#progress)"/>
+      <text x="28" y="180" fill="#85817b" font-family="Georgia,serif" font-size="18" font-style="italic">Keep going — almost there.</text>
+      <g transform="translate(28 214)">
+        <rect width="32" height="32" rx="8" fill="#dbe4ff"/><rect x="40" width="32" height="32" rx="8" fill="#91adef"/><rect x="80" width="32" height="32" rx="8" fill="#bdcffa"/><rect x="120" width="32" height="32" rx="8" fill="#6f93ee"/><rect x="160" width="32" height="32" rx="8" fill="#e8e6e1"/><rect x="200" width="32" height="32" rx="8" fill="#9cb4f1"/><rect x="240" width="26" height="32" rx="8" fill="#d5def5"/>
+      </g>
+    </g>
+
+    <g transform="translate(1150 344)">
+      <rect width="350" height="302" rx="30" fill="#101113"/>
+      <text x="28" y="44" fill="#8d9095" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="700" letter-spacing="2">DESKTOP PET</text>
+      <text x="28" y="75" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="24" font-weight="720">Mochi is happy</text>
+      <g transform="translate(85 95)">
+        <path d="M30 38 12 11l37 13c16-8 37-8 53 0l37-13-18 28c13 13 21 31 21 50 0 37-29 64-65 64S12 126 12 89c0-20 7-37 18-51Z" fill="#f2c6a7"/>
+        <path d="M48 82c8-8 17-8 25 0M94 82c8-8 17-8 25 0" fill="none" stroke="#332720" stroke-width="5" stroke-linecap="round"/>
+        <path d="M77 98c5 5 10 5 15 0" fill="none" stroke="#332720" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="127" cy="58" r="7" fill="#ff846f" opacity=".75"/>
+      </g>
+      <g transform="translate(28 260)" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="700">
+        <rect width="86" height="26" rx="13" fill="#26272a"/><text x="43" y="18" fill="#e6e6e6" text-anchor="middle">喂食 92</text>
+        <rect x="94" width="86" height="26" rx="13" fill="#26272a"/><text x="137" y="18" fill="#e6e6e6" text-anchor="middle">饮水 88</text>
+        <rect x="188" width="104" height="26" rx="13" fill="#26272a"/><text x="240" y="18" fill="#e6e6e6" text-anchor="middle">安全感 96</text>
+      </g>
+    </g>
+  </g>
+</svg>
