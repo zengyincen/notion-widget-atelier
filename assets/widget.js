@@ -3,6 +3,7 @@
   const root = document.getElementById("widgetRoot");
   const params = new URLSearchParams(location.search);
   const { components, themes } = window.WIDGET_BOX;
+  const fontCatalog = window.WIDGET_FONTS;
   const type = params.get("type") || "digital-clock";
   const meta = components.find((item) => item.id === type) || components[0];
   const theme = themes.find((item) => item.id === (params.get("theme") || "notion")) || themes[0];
@@ -15,13 +16,30 @@
   const localKey = (suffix) => `notion-widget-box:${type}:${p("label", p("title", "default"))}:${suffix}`;
   let disposers = [];
 
+  function initFont() {
+    const requested = p("font", "system");
+    const systemFont = fontCatalog?.system.find((font) => font[0] === requested);
+    if (systemFont) {
+      document.documentElement.style.setProperty("--widget-font", systemFont[2]);
+      return;
+    }
+    const googleFont = fontCatalog?.google.find((font) => font[0] === requested);
+    if (!googleFont) return;
+    const family = googleFont[0];
+    document.documentElement.style.setProperty("--widget-font", `"${family.replace(/["\\]/g, "")}", sans-serif`);
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, "+")}&display=swap`;
+    document.head.appendChild(link);
+  }
+
   function initStyle() {
     const style = document.documentElement.style;
     style.setProperty("--bg", p("bg", theme.bg));
     style.setProperty("--surface", p("surface", theme.surface));
     style.setProperty("--text", p("text", theme.text));
     style.setProperty("--accent", p("accent", theme.accent));
-    style.setProperty("--radius", `${Math.max(0, Math.min(60, n("radius", 28)))}px`);
+    style.setProperty("--radius", `${Math.max(0, Math.min(60, n("radius", 18)))}px`);
     style.setProperty("--pad", `${Math.max(6, Math.min(60, n("padding", 28)))}px`);
     style.setProperty("--scale", Math.max(.65, Math.min(1.5, n("scale", 100) / 100)));
     style.setProperty("--border", b("border", true) ? "color-mix(in srgb,var(--text) 9%,transparent)" : "transparent");
@@ -257,6 +275,7 @@
     progress:()=>renderProgress(false),kpi:renderKPI,"bar-chart":renderBarChart,"donut-chart":renderDonut,heatmap:()=>renderHeatmap(false),"streak-heatmap":()=>renderHeatmap(true),"database-progress":()=>renderProgress(true),"segmented-progress":renderSegmented
   };
 
+  initFont();
   initStyle();
   document.documentElement.lang=locale;
   (renderers[meta.id]||renderDigitalClock)();

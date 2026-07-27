@@ -9,6 +9,7 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="assets/styles.css" />
     <script src="assets/catalog.js" defer></script>
+    <script src="assets/fonts.js" defer></script>
     <script src="assets/app.js" defer></script>
   </head>
   <body>
@@ -17,14 +18,14 @@
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
         <span>Notion Widget Box</span>
       </a>
-      <label class="global-search">
+      <form class="global-search" id="searchForm" role="search">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.4A7.75 7.75 0 1 1 3.5 11.25a7.75 7.75 0 0 1 15.5 0Z"/></svg>
-        <input id="searchInput" type="search" placeholder="搜索时钟、天气、进度、Apple 风格…" autocomplete="off" />
-        <kbd>⌘ K</kbd>
-      </label>
+        <input id="searchInput" type="search" aria-label="搜索组件" placeholder="搜索时钟、天气、进度、宠物…" autocomplete="off" />
+        <output class="search-feedback" id="searchFeedback" aria-live="polite">1,314 款</output>
+        <button class="search-button" id="searchButton" type="submit">搜索</button>
+      </form>
       <nav class="top-actions" aria-label="页面导航">
         <a href="#library">组件库</a>
-        <a href="docs/MARKET-RESEARCH.zh-CN.md">市场洞察</a>
         <a class="github-button" href="https://github.com/zengyincen/notion-widget-box" target="_blank" rel="noreferrer" aria-label="GitHub">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.69c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.57 9.57 0 0 1 12 6.7c.85 0 1.71.11 2.51.34 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.59 1.03 2.68 1.03 3.84-2.34 4.69-4.57 4.93.36.31.68.92.68 1.86v2.77c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
         </a>
@@ -96,7 +97,7 @@
           <div class="dialog-top"><button class="back-button" data-close type="button">← 返回组件库</button><span class="save-state"><i></i> 参数实时更新</span></div>
           <div class="selected-heading"><span class="selected-icon" id="selectedIcon">◷</span><div><p class="eyebrow" id="selectedCategory">时间与日期</p><h2 id="selectedTitle">数字时钟</h2><p id="selectedDescription">简洁清晰的本地时钟。</p></div></div>
           <div class="preview-tools"><span>实时预览</span><div class="preview-size-switch" id="previewSizeSwitch"><button data-size="compact" type="button">紧凑</button><button class="is-active" data-size="standard" type="button">标准</button><button data-size="hero" type="button">宽幅</button></div></div>
-          <div class="preview-canvas"><div class="preview-frame standard" id="previewFrameWrap"><iframe id="previewFrame" title="组件预览"></iframe></div></div>
+          <div class="preview-canvas" id="previewCanvas"><div class="preview-frame standard" id="previewFrameWrap"><iframe id="previewFrame" title="组件预览"></iframe></div></div>
           <div class="embed-box"><div><strong>Notion 嵌入链接</strong><small>在 Notion 中输入 /embed 后粘贴</small></div><div class="url-row"><input id="shareUrl" type="text" readonly /><button id="copyUrl" class="primary-button" type="button">复制链接</button></div><button id="copyEmbed" class="text-button" type="button">复制 iframe HTML</button></div>
         </section>
 
@@ -105,6 +106,7 @@
           <form id="controlForm" autocomplete="off">
             <section class="control-section"><h3>内容设置</h3><div id="dynamicFields"></div></section>
             <section class="control-section"><h3>视觉主题</h3><div class="preset-grid" id="presetGrid"></div></section>
+            <section class="control-section font-control"><h3>组件字体</h3><label class="field"><span>搜索字体名称、类别或语言</span><input id="fontSearch" type="search" placeholder="例如：手写、中文、Arabic、Mono…" /></label><label class="field"><span>字体选择</span><select data-key="font" id="fontSelect"></select></label><div class="font-meta"><span id="fontFeedback">603 款字体</span><a href="https://fonts.google.com/" target="_blank" rel="noreferrer">开源许可 ↗</a></div></section>
             <section class="control-section"><h3>精确颜色</h3><div class="color-row"><label><input data-key="bg" type="color" /><span>背景</span></label><label><input data-key="surface" type="color" /><span>卡片</span></label><label><input data-key="text" type="color" /><span>文字</span></label><label><input data-key="accent" type="color" /><span>强调</span></label></div></section>
             <section class="control-section"><h3>结构与形式</h3>
               <div class="field-row"><label class="field"><span>布局</span><select data-key="layout" id="layoutSelect"></select></label><label class="field"><span>对齐</span><select data-key="align"><option value="left">左对齐</option><option value="center">居中</option><option value="right">右对齐</option></select></label></div>
@@ -125,7 +127,7 @@
 
     <dialog class="pet-setup" id="petSetup">
       <form method="dialog" id="petSetupForm">
-        <button class="close-button" value="cancel" aria-label="关闭">×</button>
+        <button class="close-button" id="closePetSetup" type="button" aria-label="关闭">×</button>
         <div class="setup-pet-face">/ᐠ˵- ᴗ -˵ᐟ\\<i>✦</i></div>
         <p class="eyebrow">MEET YOUR COMPANION</p>
         <h2>领养一只专属宠物</h2>

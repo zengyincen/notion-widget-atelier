@@ -2,9 +2,15 @@
   "use strict";
 
   const { components, categories, themes, layouts } = window.WIDGET_BOX;
+  const fontCatalog = window.WIDGET_FONTS;
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const categoryMap = Object.fromEntries(categories.map((item) => [item.id, item]));
+  const featureCategories = [
+    { id: "feature-progress", label: "进度条专区", icon: "▰", featured: true, componentIds: ["progress", "database-progress", "segmented-progress", "day-progress", "week-progress", "month-progress", "year-progress", "financial-goal", "savings-goal"] },
+    { id: "feature-pet", label: "桌面宠物", icon: "◕", featured: true, componentIds: ["pet-companion"] }
+  ];
+  const displayCategories = [categories[0], ...featureCategories, ...categories.slice(1)];
+  const categoryMap = Object.fromEntries([...categories, ...featureCategories].map((item) => [item.id, item]));
   const themeMap = Object.fromEntries(themes.map((item) => [item.id, item]));
   const layoutMap = Object.fromEntries(layouts.map((item) => [item.id, item]));
   const variants = components.flatMap((component, componentIndex) => themes.flatMap((theme) => layouts.map((layout) => ({
@@ -26,11 +32,11 @@
     view: "grid",
     favorites: new Set(readJSON("widgetBox.favorites", [])),
     selected: null,
-    config: {}, pendingVariant: null
+    config: {}, pendingVariant: null, petNeedsAdoption: false
   };
 
   const els = {
-    search: $("#searchInput"), grid: $("#widgetGrid"), resultCount: $("#resultCount"), loadMore: $("#loadMore"), remaining: $("#remainingCount"), empty: $("#emptyState"),
+    search: $("#searchInput"), searchFeedback: $("#searchFeedback"), grid: $("#widgetGrid"), resultCount: $("#resultCount"), loadMore: $("#loadMore"), remaining: $("#remainingCount"), empty: $("#emptyState"),
     categoryFilters: $("#categoryFilters"), themeFilters: $("#themeFilters"), layoutFilters: $("#layoutFilters"), offline: $("#offlineFilter"), sort: $("#sortSelect"), activeFilters: $("#activeFilters"),
     dialog: $("#customizer"), frame: $("#previewFrame"), frameWrap: $("#previewFrameWrap"), form: $("#controlForm"), dynamicFields: $("#dynamicFields"), presetGrid: $("#presetGrid"), shareUrl: $("#shareUrl"), toast: $("#toast")
   };
@@ -63,19 +69,22 @@
   }
 
   function renderFilterControls() {
-    els.categoryFilters.innerHTML = categories.map((category) => {
-      const count = category.id === "all" ? variants.length : components.filter((item) => item.category === category.id).length * themes.length * layouts.length;
-      return `<button class="filter-option ${state.category === category.id ? "is-active" : ""}" data-filter-category="${category.id}" type="button"><i>${category.icon}</i><span>${category.label}</span><b>${count}</b></button>`;
+    els.categoryFilters.innerHTML = displayCategories.map((category) => {
+      const count = category.id === "all" ? variants.length : components.filter((item) => category.componentIds ? category.componentIds.includes(item.id) : item.category === category.id).length * themes.length * layouts.length;
+      return `<button class="filter-option ${category.featured ? "is-feature" : ""} ${state.category === category.id ? "is-active" : ""}" data-filter-category="${category.id}" type="button"><i>${category.icon}</i><span>${category.label}</span><b>${count}</b></button>`;
     }).join("");
     els.themeFilters.innerHTML = `<button class="filter-option ${state.theme === "all" ? "is-active" : ""}" data-filter-theme="all" type="button"><i style="--dot:linear-gradient(135deg,#ff8a65,#4f8cff)"></i><span>全部风格</span><b>${variants.length}</b></button>` + themes.map((theme) => `<button class="filter-option ${state.theme === theme.id ? "is-active" : ""}" data-filter-theme="${theme.id}" type="button"><i style="--dot:${theme.accent}"></i><span>${theme.short}</span><b>${components.length * layouts.length}</b></button>`).join("");
     els.layoutFilters.innerHTML = `<button class="filter-option ${state.layout === "all" ? "is-active" : ""}" data-filter-layout="all" type="button"><i>◇</i><span>全部尺寸</span><b>${variants.length}</b></button>` + layouts.map((layout) => `<button class="filter-option ${state.layout === layout.id ? "is-active" : ""}" data-filter-layout="${layout.id}" type="button"><i>${layout.id === "compact" ? "▬" : layout.id === "standard" ? "□" : "▭"}</i><span>${layout.label}</span><b>${components.length * themes.length}</b></button>`).join("");
   }
 
   function bindEvents() {
-    els.search.addEventListener("input", debounce(() => { state.query = els.search.value.trim(); state.shown = 24; render(); }, 100));
+    const runSearch = (scroll = false) => { state.query = els.search.value.trim(); state.shown = 24; render(); if (scroll) $("#library").scrollIntoView({ behavior: "smooth", block: "start" }); };
+    els.search.addEventListener("input", debounce(() => runSearch(false), 100));
+    $("#searchForm").addEventListener("submit", (event) => { event.preventDefault(); runSearch(true); });
     document.addEventListener("keydown", (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); els.search.focus(); els.search.select(); }
-      if (event.key === "Escape" && els.dialog.open) els.dialog.close();
+      if (event.key === "Escape" && $("#petSetup").open) $("#petSetup").close();
+      else if (event.key === "Escape" && els.dialog.open) els.dialog.close();
     });
     document.addEventListener("click", (event) => {
       const category = event.target.closest("[data-filter-category]");
@@ -105,13 +114,17 @@
     els.loadMore.addEventListener("click", () => { state.shown += 24; render(); });
     $("#surpriseButton").addEventListener("click", () => openCustomizer(variants[Math.floor(Math.random() * variants.length)]));
     $("#petSetupForm").addEventListener("submit", createPetProfile);
-    els.form.addEventListener("input", debounce(readFormAndPreview, 80));
+    $("#closePetSetup").addEventListener("click", () => $("#petSetup").close());
+    $("#petSetup").addEventListener("click", (event) => { if (event.target === $("#petSetup")) $("#petSetup").close(); });
+    $("#fontSearch").addEventListener("input", (event) => renderFontOptions(event.target.value));
+    els.form.addEventListener("input", debounce((event) => { if (event.target.id !== "fontSearch") readFormAndPreview(); }, 80));
     els.form.addEventListener("change", readFormAndPreview);
     $("#copyUrl").addEventListener("click", copyUrl);
     $("#footerCopy").addEventListener("click", copyUrl);
     $("#copyEmbed").addEventListener("click", () => copyText(`<iframe src="${els.shareUrl.value}" width="100%" height="300" frameborder="0" allow="clipboard-write"></iframe>`, "iframe 代码已复制"));
     $("#resetButton").addEventListener("click", () => { if (state.selected) setupCustomizer(state.selected, true); });
     document.addEventListener("click", (event) => {
+      if (event.target.closest("#adoptPetButton")) beginPetAdoption();
       if (event.target.closest("#newPetButton")) createAnotherPet();
       if (event.target.closest("#copyFormula")) copyText($("#formulaOutput")?.value || "", "Notion 数据库公式已复制");
     });
@@ -134,7 +147,10 @@
   function getFiltered() {
     const words = state.query.toLowerCase().split(/\s+/).filter(Boolean);
     let result = variants.filter((item) => {
-      if (state.category !== "all" && item.component.category !== state.category) return false;
+      if (state.category !== "all") {
+        const selectedCategory = categoryMap[state.category];
+        if (selectedCategory?.componentIds ? !selectedCategory.componentIds.includes(item.component.id) : item.component.category !== state.category) return false;
+      }
       if (state.theme !== "all" && item.theme.id !== state.theme) return false;
       if (state.layout !== "all" && item.layout.id !== state.layout) return false;
       if (state.offline && item.component.online) return false;
@@ -160,6 +176,8 @@
     const filtered = getFiltered();
     const visible = filtered.slice(0, state.shown);
     els.resultCount.textContent = filtered.length.toLocaleString("zh-CN");
+    els.searchFeedback.textContent = state.query ? `找到 ${filtered.length.toLocaleString("zh-CN")} 款` : `${filtered.length.toLocaleString("zh-CN")} 款`;
+    els.searchFeedback.classList.toggle("is-empty", filtered.length === 0);
     els.grid.innerHTML = visible.map(cardTemplate).join("");
     els.grid.classList.toggle("list-view", state.view === "list");
     els.empty.hidden = filtered.length > 0;
@@ -216,13 +234,7 @@
     render();
   }
 
-  function openCustomizer(variant, skipPetSetup = false) {
-    if (variant.component.id === "pet-companion" && !skipPetSetup && !readJSON("widgetBox.pet.profile", null)) {
-      state.pendingVariant = variant;
-      $("#petSetup").showModal();
-      timeoutFocus("#setupOwnerName");
-      return;
-    }
+  function openCustomizer(variant) {
     state.selected = variant;
     setupCustomizer(variant, false);
     if (!els.dialog.open) els.dialog.showModal();
@@ -238,8 +250,8 @@
     state.config = {
       ...defaults,
       theme: theme.id, layout: layout.id, align: "left", bg: theme.bg, surface: theme.surface, text: theme.text, accent: theme.accent,
-      radius: theme.id === "notion" ? 22 : 28, scale: 100, padding: 28, border: true, shadow: true, transparent: false,
-      locale: "zh-CN", timezone: "Asia/Shanghai",
+      radius: theme.id === "notion" ? 16 : 18, scale: 100, padding: 28, border: true, shadow: true, transparent: false,
+      font: "system", locale: "zh-CN", timezone: "Asia/Shanghai",
       ...(saved || {})
     };
     if (!saved || forceDefault) Object.assign(state.config, { theme: theme.id, layout: layout.id, bg: theme.bg, surface: theme.surface, text: theme.text, accent: theme.accent });
@@ -247,13 +259,23 @@
     $("#selectedCategory").textContent = categoryMap[component.category].label;
     $("#selectedTitle").textContent = component.title;
     $("#selectedDescription").textContent = component.description;
-    els.dynamicFields.innerHTML = (component.fields.map(fieldTemplate).join("") || '<p class="field-note">这个组件无需额外内容设置。</p>') + (component.id === "pet-companion" ? '<button class="text-button" id="newPetButton" type="button">＋ 创建另一只独立宠物</button>' : "") + (["database-progress", "heatmap"].includes(component.id) ? '<a class="notion-connect-link" href="connect.html" target="_blank">安全连接 Notion 数据库 <span>↗</span></a>' : "") + (component.id === "database-progress" ? '<div class="formula-helper"><strong>Notion Formula 2.0</strong><textarea id="formulaOutput" rows="7" readonly></textarea><button class="text-button" id="copyFormula" type="button">复制数据库公式</button></div>' : "");
+    const petProfile = component.id === "pet-companion" ? readJSON("widgetBox.pet.profile", null) : null;
+    state.petNeedsAdoption = component.id === "pet-companion" && !petProfile;
+    const visibleFields = component.id === "pet-companion" && !petProfile ? component.fields.filter((field) => ["petType", "showNeeds"].includes(field.key)) : component.fields;
+    const petAction = component.id !== "pet-companion" ? "" : petProfile
+      ? '<button class="text-button" id="newPetButton" type="button">＋ 创建另一只独立宠物</button>'
+      : '<div class="pet-adopt-callout"><strong>先看看它是否适合你</strong><span>选好宠物、主题和样式后，再创建专属名字。</span><button class="primary-button" id="adoptPetButton" type="button">喜欢这只，给它取名字 →</button></div>';
+    els.dynamicFields.innerHTML = (visibleFields.map(fieldTemplate).join("") || '<p class="field-note">这个组件无需额外内容设置。</p>') + petAction + (["database-progress", "heatmap"].includes(component.id) ? '<a class="notion-connect-link" href="connect.html" target="_blank">安全连接 Notion 数据库 <span>↗</span></a>' : "") + (component.id === "database-progress" ? '<div class="formula-helper"><strong>Notion Formula 2.0</strong><textarea id="formulaOutput" rows="7" readonly></textarea><button class="text-button" id="copyFormula" type="button">复制数据库公式</button></div>' : "");
     els.presetGrid.innerHTML = themes.map((item) => `<button class="preset ${state.config.theme === item.id ? "is-active" : ""}" data-preset="${item.id}" type="button"><i style="--a:${item.bg};--b:${item.accent}"></i><span>${item.short}</span></button>`).join("");
     $("#layoutSelect").innerHTML = layouts.map((item) => `<option value="${item.id}">${item.label} · ${item.width}×${item.height}</option>`).join("");
     if (component.id === "pet-companion") {
-      const profile = readJSON("widgetBox.pet.profile", null);
-      if (profile) Object.assign(state.config, profile);
+      if (petProfile) Object.assign(state.config, petProfile);
     }
+    ["#copyUrl", "#copyEmbed", "#footerCopy"].forEach((selector) => { $(selector).disabled = state.petNeedsAdoption; });
+    $(".embed-box").classList.toggle("is-locked", state.petNeedsAdoption);
+    $(".embed-box small").textContent = state.petNeedsAdoption ? "确认领养并创建独立身份后生成" : "在 Notion 中输入 /embed 后粘贴";
+    $("#fontSearch").value = "";
+    renderFontOptions();
     writeConfigToForm();
     setPreviewSize(state.config.layout);
     updatePreview();
@@ -273,6 +295,35 @@
     if (field.type === "textarea") return `<label class="field"><span>${escapeHtml(field.label)}</span><textarea data-key="${field.key}" rows="3" placeholder="${escapeHtml(field.placeholder)}">${escapeHtml(value)}</textarea></label>`;
     const attrs = field.type === "number" ? `min="${field.min}" max="${field.max}"` : "";
     return `<label class="field"><span>${escapeHtml(field.label)}</span><input data-key="${field.key}" type="${field.type}" value="${escapeHtml(value)}" placeholder="${escapeHtml(field.placeholder)}" ${attrs} ${field.key === "petId" ? "readonly" : ""}/></label>`;
+  }
+
+  function renderFontOptions(query = "") {
+    const select = $("#fontSelect");
+    if (!select || !fontCatalog) return;
+    const categoryLabels = { "Sans Serif": "黑体 / 无衬线", Serif: "衬线 / 宋体", Display: "艺术体", Handwriting: "手写体", Monospace: "等宽体" };
+    const scriptLabels = { "chinese-simplified": "简体中文", "chinese-traditional": "繁体中文", japanese: "日文", korean: "韩文", arabic: "阿拉伯文", devanagari: "天城文", hebrew: "希伯来文", thai: "泰文", vietnamese: "越南文", cyrillic: "西里尔文", greek: "希腊文", tamil: "泰米尔文", bengali: "孟加拉文", ethiopic: "埃塞俄比亚文", khmer: "高棉文" };
+    const needle = query.trim().toLowerCase();
+    const systemMatches = fontCatalog.system.filter((font) => !needle || `${font[0]} ${font[1]} notion 默认 衬线 等宽`.toLowerCase().includes(needle));
+    const googleMatches = fontCatalog.google.filter(([family, category, scripts]) => {
+      const haystack = [family, category, categoryLabels[category], ...scripts, ...scripts.map((script) => scriptLabels[script] || "")].join(" ").toLowerCase();
+      return !needle || haystack.includes(needle);
+    });
+    const systemMarkup = systemMatches.length ? `<optgroup label="Notion 内置字体">${systemMatches.map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join("")}</optgroup>` : "";
+    const groupOrder = ["Sans Serif", "Serif", "Display", "Handwriting", "Monospace"];
+    const googleMarkup = groupOrder.map((category) => {
+      const fonts = googleMatches.filter((font) => font[1] === category);
+      if (!fonts.length) return "";
+      return `<optgroup label="${categoryLabels[category]}">${fonts.map(([family, , scripts]) => { const language = scripts.map((script) => scriptLabels[script]).filter(Boolean).slice(0, 2).join(" / "); return `<option value="${escapeHtml(family)}">${escapeHtml(family)}${language ? ` · ${escapeHtml(language)}` : ""}</option>`; }).join("")}</optgroup>`;
+    }).join("");
+    select.innerHTML = systemMarkup + googleMarkup;
+    const selected = state.config.font || "system";
+    if (![...select.options].some((option) => option.value === selected)) {
+      const current = [...fontCatalog.system, ...fontCatalog.google].find((font) => font[0] === selected);
+      const currentLabel = fontCatalog.system.some((font) => font[0] === selected) ? current?.[1] : current?.[0];
+      if (currentLabel) select.insertAdjacentHTML("afterbegin", `<option value="${escapeHtml(selected)}" hidden>${escapeHtml(currentLabel)} · 当前使用</option>`);
+    }
+    select.value = selected;
+    $("#fontFeedback").textContent = `${(systemMatches.length + googleMatches.length).toLocaleString("zh-CN")} / ${fontCatalog.total.toLocaleString("zh-CN")} 款 · Google Fonts 可商用`;
   }
 
   function writeConfigToForm() {
@@ -329,7 +380,9 @@
   function updatePreview() {
     if (!state.selected) return;
     const url = widgetUrl();
-    els.shareUrl.value = url;
+    $("#previewCanvas").classList.toggle("is-dark", state.config.theme === "midnight");
+    els.frameWrap.style.background = state.config.theme === "midnight" ? "#000" : "#fff";
+    els.shareUrl.value = state.petNeedsAdoption ? "请先确认领养并给宠物取名字" : url;
     els.frame.src = url;
   }
 
@@ -341,6 +394,13 @@
   function copyUrl() { copyText(els.shareUrl.value, "Notion 嵌入链接已复制"); }
   function tickHeroClock() { const target = $("#heroClock"); if (target) target.textContent = new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date()); }
   function timeoutFocus(selector) { setTimeout(() => $(selector)?.focus(), 120); }
+  function beginPetAdoption() {
+    state.pendingVariant = state.selected;
+    $("#setupOwnerName").value = "";
+    $("#setupPetName").value = "";
+    if (!$("#petSetup").open) $("#petSetup").showModal();
+    timeoutFocus("#setupOwnerName");
+  }
   function createPetProfile(event) {
     event.preventDefault();
     const ownerName = $("#setupOwnerName").value.trim();
@@ -354,18 +414,17 @@
     $("#petSetup").close();
     const variant = state.pendingVariant || variants.find((item) => item.component.id === "pet-companion");
     state.pendingVariant = null;
-    if (variant) openCustomizer(variant, true);
+    if (variant) {
+      state.selected = variant;
+      setupCustomizer(variant, false);
+      if (!els.dialog.open) els.dialog.showModal();
+    }
   }
   function createAnotherPet() {
     if (!confirm("创建新宠物会让定制器切换到新的独立身份；旧嵌入链接中的宠物不会被删除。继续吗？")) return;
     localStorage.removeItem("widgetBox.pet.profile");
     localStorage.removeItem("widgetBox.config.pet-companion");
-    state.pendingVariant = state.selected;
-    els.dialog.close();
-    $("#setupOwnerName").value = "";
-    $("#setupPetName").value = "";
-    $("#petSetup").showModal();
-    timeoutFocus("#setupOwnerName");
+    setupCustomizer(state.selected, true);
   }
   function updateFormulaOutput() {
     const output = $("#formulaOutput");
