@@ -13,7 +13,6 @@
 </p>
 
 <p align="center">
-  <a href="https://nwb.imnotfound.eu.org/health"><img src="https://img.shields.io/website?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fhealth&amp;style=flat-square&amp;label=Cloud%20Sync" alt="Cloud sync status" /></a>
   <a href="https://widget.imnotfound.eu.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fmetrics%2Fbadge%2Fvisitors&amp;style=flat-square" alt="Website visitors" /></a>
   <a href="https://widget.imnotfound.eu.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fmetrics%2Fbadge%2Fusers&amp;style=flat-square" alt="Widget users" /></a>
   <a href="https://github.com/zengyincen/notion-widget-atelier"><img src="https://komarev.com/ghpvc/?username=zengyincen&amp;repo=notion-widget-atelier&amp;label=README%20views&amp;color=blue&amp;style=flat-square" alt="README views" /></a>
