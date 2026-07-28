@@ -4,7 +4,7 @@
   </a>
 </p>
 
-<h1 align="center">Widget Atelier</h1>
+<h1 align="center">Notion Widget Atelier</h1>
 
 <p align="center">
   把你的 Notion，变成真正属于你的空间。
