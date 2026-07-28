@@ -17,6 +17,15 @@
   const localKey = (suffix) => `notion-widget-box:${type}:${p("label", p("title", "default"))}:${suffix}`;
   let disposers = [];
 
+  function trackUsage() {
+    if (p("preview") === "1" || !managedService?.apiBase) return;
+    fetch(`${managedService.apiBase}/metrics/track`, {
+      method: "POST",
+      body: JSON.stringify({ kind: "use" }),
+      keepalive: true,
+    }).catch(() => {});
+  }
+
   function initFont() {
     const requested = p("font", "system");
     const systemFont = fontCatalog?.system.find((font) => font[0] === requested);
@@ -378,6 +387,7 @@
 
   initFont();
   initStyle();
+  trackUsage();
   document.documentElement.lang=locale;
   (renderers[meta.id]||renderDigitalClock)();
   window.addEventListener("beforeunload",()=>disposers.forEach(fn=>fn()));

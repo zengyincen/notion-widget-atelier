@@ -4,6 +4,8 @@ const DEFAULT_STATE = Object.freeze({ food: 82, water: 76, love: 88 });
 const ACTIONS = new Set(["feed", "water", "pet"]);
 const CARE_COOLDOWN_MS = 2 * 60 * 60 * 1000;
 const ACTION_THROTTLE_MS = 400;
+const METRIC_KINDS = new Set(["visit", "use"]);
+const METRIC_SHARD_COUNT = 16;
 
 export class PetState extends DurableObject {
   constructor(ctx, env) {
@@ -128,6 +130,44 @@ export class PetState extends DurableObject {
   }
 }
 
+export class MetricsShard extends DurableObject {
+  constructor(ctx, env) {
+    super(ctx, env);
+    ctx.blockConcurrencyWhile(async () => {
+      this.ctx.storage.sql.exec(`
+        CREATE TABLE IF NOT EXISTS metric_identities (
+          kind TEXT NOT NULL,
+          identity TEXT NOT NULL,
+          first_seen INTEGER NOT NULL,
+          last_seen INTEGER NOT NULL,
+          PRIMARY KEY (kind, identity)
+        ) WITHOUT ROWID
+      `);
+    });
+  }
+
+  async track(kind, identity) {
+    if (!METRIC_KINDS.has(kind) || !/^[a-f0-9]{64}$/.test(identity)) throw new Error("Invalid metric event");
+    const now = Date.now();
+    this.ctx.storage.sql.exec(
+      "INSERT OR IGNORE INTO metric_identities (kind, identity, first_seen, last_seen) VALUES (?, ?, ?, ?)",
+      kind, identity, now, now,
+    );
+    this.ctx.storage.sql.exec(
+      "UPDATE metric_identities SET last_seen = ? WHERE kind = ? AND identity = ?",
+      now, kind, identity,
+    );
+    return { ok: true };
+  }
+
+  async getCounts() {
+    const rows = this.ctx.storage.sql.exec(
+      "SELECT kind, COUNT(*) AS total FROM metric_identities GROUP BY kind"
+    ).toArray();
+    return Object.fromEntries(rows.map((row) => [row.kind, Number(row.total)]));
+  }
+}
+
 function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": "*",
@@ -140,6 +180,72 @@ function corsHeaders() {
 
 function json(data, status = 200) {
   return Response.json(data, { status, headers: corsHeaders() });
+}
+
+function metricOriginAllowed(request) {
+  const origin = request.headers.get("Origin") || "";
+  return origin === "https://widget.imnotfound.eu.org"
+    || origin === "https://zengyincen.github.io"
+    || /^http:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?$/.test(origin);
+}
+
+async function metricIdentity(request, env) {
+  if (!env.METRICS_SALT) throw new Error("Metrics are not configured");
+  const source = [
+    request.headers.get("CF-Connecting-IP") || "unknown",
+    (request.headers.get("User-Agent") || "unknown").slice(0, 320),
+    (request.headers.get("Accept-Language") || "unknown").slice(0, 120),
+  ].join("\n");
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(env.METRICS_SALT),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(source));
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function metricShard(env, identity) {
+  const shard = Number.parseInt(identity[0], 16) % METRIC_SHARD_COUNT;
+  return env.METRICS.getByName(`audience-${shard.toString(16)}`);
+}
+
+async function readMetricTotals(request, env) {
+  const cache = caches.default;
+  const cacheUrl = new URL("/metrics/.totals-v1", request.url);
+  const cacheKey = new Request(cacheUrl, { method: "GET" });
+  const cached = await cache.match(cacheKey);
+  if (cached) return cached.json();
+  const rows = await Promise.all(
+    Array.from({ length: METRIC_SHARD_COUNT }, (_, index) => env.METRICS.getByName(`audience-${index.toString(16)}`).getCounts())
+  );
+  const totals = rows.reduce((result, row) => ({
+    visitors: result.visitors + Number(row.visit || 0),
+    users: result.users + Number(row.use || 0),
+  }), { visitors: 0, users: 0 });
+  const payload = { ...totals, updatedAt: new Date().toISOString() };
+  await cache.put(cacheKey, Response.json(payload, { headers: { "Cache-Control": "public, max-age=300" } }));
+  return payload;
+}
+
+function badge(data, kind) {
+  const isVisitors = kind === "visitors";
+  return Response.json({
+    schemaVersion: 1,
+    label: isVisitors ? "网站访问人数" : "组件使用人数",
+    message: `${Number(data[kind] || 0).toLocaleString("zh-CN")} 人`,
+    color: isVisitors ? "f38020" : "20201e",
+    namedLogo: "cloudflare",
+    logoColor: "white",
+    cacheSeconds: 300,
+  }, {
+    headers: {
+      ...corsHeaders(),
+      "Cache-Control": "public, max-age=300",
+    },
+  });
 }
 
 function actionPage(action, state) {
@@ -286,6 +392,31 @@ export default {
     if (url.pathname === "/" || url.pathname === "/health") {
       if (request.method !== "GET") return json({ error: "GET required" }, 405);
       return json({ ok: true, service: "Notion Widget Box Cloud", storage: "Durable Objects", version: 2 });
+    }
+    if (url.pathname === "/metrics/track") {
+      if (request.method !== "POST") return json({ error: "POST required" }, 405);
+      if (!metricOriginAllowed(request)) return json({ error: "Origin not allowed" }, 403);
+      try {
+        const body = await request.json();
+        if (!METRIC_KINDS.has(body?.kind)) return json({ error: "Unsupported metric kind" }, 400);
+        const identity = await metricIdentity(request, env);
+        await metricShard(env, identity).track(body.kind, identity);
+        await caches.default.delete(new Request(new URL("/metrics/.totals-v1", request.url), { method: "GET" }));
+        return json({ ok: true });
+      } catch (error) {
+        return json({ error: error instanceof Error ? error.message : "Metric tracking failed" }, 503);
+      }
+    }
+    if (url.pathname === "/metrics/stats" || url.pathname === "/metrics/badge/visitors" || url.pathname === "/metrics/badge/users") {
+      if (request.method !== "GET") return json({ error: "GET required" }, 405);
+      try {
+        const totals = await readMetricTotals(request, env);
+        if (url.pathname.endsWith("/visitors")) return badge(totals, "visitors");
+        if (url.pathname.endsWith("/users")) return badge(totals, "users");
+        return Response.json(totals, { headers: { ...corsHeaders(), "Cache-Control": "public, max-age=300" } });
+      } catch {
+        return json({ error: "Metrics are temporarily unavailable" }, 503);
+      }
     }
     if (url.pathname === "/notion/public") {
       if (request.method !== "GET") return json({ error: "GET required" }, 405);

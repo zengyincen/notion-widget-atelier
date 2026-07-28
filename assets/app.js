@@ -57,7 +57,22 @@
     let timer; return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), delay); };
   }
 
+  function trackAudience(kind) {
+    if (!serviceConfig?.apiBase) return;
+    const sessionKey = `widgetBox.metrics.${kind}.sent`;
+    try {
+      if (sessionStorage.getItem(sessionKey)) return;
+      sessionStorage.setItem(sessionKey, "1");
+    } catch {}
+    fetch(`${serviceConfig.apiBase}/metrics/track`, {
+      method: "POST",
+      body: JSON.stringify({ kind }),
+      keepalive: true,
+    }).catch(() => {});
+  }
+
   function init() {
+    trackAudience("visit");
     $$('[data-total-components]').forEach((element) => { element.textContent = components.length.toLocaleString("zh-CN"); });
     $$('[data-total-variants]').forEach((element) => { element.textContent = variants.length.toLocaleString("zh-CN"); });
     $$('[data-total-fonts]').forEach((element) => { element.textContent = fontCatalog.total.toLocaleString("zh-CN"); });
@@ -411,7 +426,7 @@
 
   function widgetUrl(base = publicBase) {
     const url = new URL("widget.html", `${base}/`);
-    url.searchParams.set("v", "20260727.8");
+    url.searchParams.set("v", "20260728.1");
     url.searchParams.set("type", state.selected.component.id);
     Object.entries(state.config).forEach(([key, value]) => {
       if (["syncMode", "syncUrl", "githubRepo"].includes(key)) return;
@@ -427,7 +442,9 @@
     $("#previewCanvas").classList.toggle("is-dark", state.config.theme === "midnight");
     els.frameWrap.style.background = state.config.theme === "midnight" ? "#000" : "#fff";
     els.shareUrl.value = state.petNeedsAdoption ? "请先确认领养并给宠物取名字" : url;
-    els.frame.src = widgetUrl(localPreviewBase);
+    const previewUrl = new URL(widgetUrl(localPreviewBase));
+    previewUrl.searchParams.set("preview", "1");
+    els.frame.src = previewUrl.toString();
   }
 
   async function copyText(text, message) {

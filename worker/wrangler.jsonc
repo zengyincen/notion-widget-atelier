@@ -10,10 +10,12 @@
   "observability": { "enabled": true, "head_sampling_rate": 1 },
   "durable_objects": {
     "bindings": [
-      { "name": "PETS", "class_name": "PetState" }
+      { "name": "PETS", "class_name": "PetState" },
+      { "name": "METRICS", "class_name": "MetricsShard" }
     ]
   },
   "migrations": [
-    { "tag": "v1", "new_sqlite_classes": ["PetState"] }
+    { "tag": "v1", "new_sqlite_classes": ["PetState"] },
+    { "tag": "v2", "new_sqlite_classes": ["MetricsShard"] }
   ]
 }

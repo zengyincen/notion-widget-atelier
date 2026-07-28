@@ -15,6 +15,8 @@
 <p align="center">
   <a href="https://github.com/zengyincen/notion-widget-box/actions/workflows/deploy-pages.yml"><img src="https://img.shields.io/github/actions/workflow/status/zengyincen/notion-widget-box/deploy-pages.yml?branch=main&amp;style=flat-square&amp;label=Pages" alt="GitHub Pages status" /></a>
   <a href="https://nwb.imnotfound.eu.org/health"><img src="https://img.shields.io/website?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fhealth&amp;style=flat-square&amp;label=Cloud%20Sync" alt="Cloud sync status" /></a>
+  <a href="https://widget.imnotfound.eu.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fmetrics%2Fbadge%2Fvisitors&amp;style=flat-square" alt="网站访问人数" /></a>
+  <a href="https://widget.imnotfound.eu.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fmetrics%2Fbadge%2Fusers&amp;style=flat-square" alt="组件使用人数" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/github/license/zengyincen/notion-widget-box?style=flat-square" alt="MIT License" /></a>
   <a href="https://github.com/zengyincen/notion-widget-box/stargazers"><img src="https://img.shields.io/github/stars/zengyincen/notion-widget-box?style=flat-square" alt="GitHub Stars" /></a>
   <a href="https://github.com/zengyincen/notion-widget-box/commits/main"><img src="https://img.shields.io/github/last-commit/zengyincen/notion-widget-box?style=flat-square" alt="Last commit" /></a>
@@ -122,6 +124,7 @@ Notion Widget Box 是我们为 Notion 用户提供的在线小组件服务。你
 - 我们不要求用户提交 Notion Integration Token、Cloudflare 密钥或 GitHub 凭证。
 - 普通组件配置写在生成链接中；部分纯本地交互状态保存在浏览器 `localStorage`。
 - 动态宠物仅保存随机宠物 ID 与饱腹、水分、安心和操作时间，不保存邮箱。
+- 访问与使用统计只保存由 Cloudflare Worker HMAC 匿名化后的去重标识，不保存原始 IP、姓名或邮箱。
 - 公开 Notion 连接只接受 `notion.so` / `notion.site` 链接，并只返回列结构或聚合值。
 - 黄历、星座和运势内容仅供娱乐，不构成专业建议。
 
