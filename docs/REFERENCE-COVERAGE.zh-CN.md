@@ -41,3 +41,21 @@
 同类扩展引擎：`vinyl-player`、`cassette-player`、`ambient-mixer`、`lyric-card`、`album-cover`、`kinetic-type`、`generative-art`、`gradient-mesh`、`constellation`。
 
 参考仓库依赖 Express、Quotesy、APlayer 与 MetingJS；本项目为适配 GitHub Pages，使用原生 HTML Audio 和浏览器端数据源，不要求部署 Node 服务。
+
+## 本轮市场缺口补齐（2026-07-28）
+
+| 市场常见组件 | Notion Widget Box 对应引擎 | 数据 / 交互边界 |
+| --- | --- | --- |
+| Google Calendar / 外部日历 | `google-calendar` | 用户粘贴公开日历 URL；私有 OAuth 连接器留待后续 |
+| Schedule Builder / 周计划 | `schedule-builder` | URL 配置日程，完成状态保存在浏览器 |
+| Pomodoro + Todo | `pomodoro-todo` | 计时与任务在同一卡片，本地持久化 |
+| Recurring Tasks | `recurring-tasks` | 每日按日期生成独立完成记录 |
+| Flashcards / Quizlet | `flashcards` | `正面|背面` 数据格式，点击翻面与切卡 |
+| Whiteboard / Witeboard | `whiteboard` | Pointer Events + Canvas，本地保存草图 |
+| Tally / Mail Form / Feedback | `feedback-form` | 通过 `mailto:` 交给用户自己的邮箱，不托管表单数据 |
+| Coolors / Color Palette | `color-palette` | 从主色生成色板，点击复制 HEX |
+| ASCII Art | `ascii-art` | 等宽文本与强调色主题 |
+| News / RSS 摘要 | `news-feed` | 当前为 URL 配置的标题列表，RSS 安全代理列为下一阶段 |
+| Tarot / Daily Card | `tarot` | 日期 + 牌组种子稳定抽牌，仅作娱乐灵感 |
+| Ramadan / Prayer Times | `prayer-times` | AlAdhan 公开 API，城市、国家、计算方法可调 |
+| Crypto / CoinGecko | `crypto-ticker` | CoinGecko 公共行情，组件联网时显示 24 小时变化 |

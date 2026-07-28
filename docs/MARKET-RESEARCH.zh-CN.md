@@ -1,12 +1,12 @@
 # Notion 小组件市场需求洞察
 
-调研日期：2026-07-27
+调研日期：2026-07-28
 
 ## 结论摘要
 
 市场的核心缺口不是“缺少更多时钟”，而是缺少一个同时满足以下条件的产品：免费、无需账号、风格统一、响应式、高度可定制、稳定托管、能覆盖基础展示与轻交互，并清楚区分本地状态与跨设备同步。
 
-因此 Notion Widget Box 采用“少量可维护的组件引擎 × 多主题 × 多布局”的组合架构，而不是复制上千份静态 HTML。主页只展示 85 个不重复的真实组件；每个组件可在定制器中切换 6 套主题与 3 种布局，共形成 1,530 个配置组合，所有组合仍共享同一套可靠实现。
+因此 Notion Widget Box 采用“少量可维护的组件引擎 × 多主题 × 多布局”的组合架构，而不是复制上千份静态 HTML。主页只展示 98 个不重复的真实组件；每个组件可在定制器中切换 6 套主题与 3 种布局，共形成 1,764 个配置组合，所有组合仍共享同一套可靠实现。
 
 ## 市场信号
 
@@ -39,6 +39,18 @@ GitHub Pages 的优势是链接稳定、加载轻量；弱点是无法直接处�
 
 本项目将两类能力分开实现，避免把 API Token 暴露在前端。
 
+### 5. 本轮补充调研：缺口集中在“把外部工具带进 Notion”
+
+本轮逐页检查了 [Indify](https://indify.co/)、[Plus AI Notion Widgets](https://plusai.com/notion-widgets)、[Apption](https://apption.co/) 与 [Widgetly](https://www.widgetly.co/)，并用 Exa 搜索了 [Widgets For Notion](https://widgetsfornotion.com/)、[NotionBox](https://www.notion-box.com/all-widgets) 和 [Blocky](https://www.blocky.so/widgets)。这些目录共同暴露出当前目录最值得补齐的组件：
+
+- **工作台连接**：Google Calendar、周计划 / Schedule Builder、新闻摘要、公开网页 iframe。
+- **学习与效率**：Pomodoro + Todo、重复任务、闪卡 / Quizlet、白板 / Witeboard。
+- **转化与收集**：反馈表单、邮件收集、按钮与支付入口。
+- **数据与行情**：Crypto / CoinGecko 行情、TradingView 类市场入口、KPI 与页面浏览。
+- **文化与生活**：塔罗、祈祷时间 / Ramadan、调色板、ASCII 艺术。
+
+本轮已将其中无需账号、可以由原生前端或公开 API 稳定实现的 13 个组件加入目录：`google-calendar`、`schedule-builder`、`pomodoro-todo`、`recurring-tasks`、`flashcards`、`whiteboard`、`feedback-form`、`color-palette`、`ascii-art`、`news-feed`、`tarot`、`prayer-times`、`crypto-ticker`。需要 OAuth 或商业数据许可的 Google Calendar 私有数据、TradingView 私有图表、Stripe / PayPal 交易数据、评论后端暂不伪装成“免费内置”，而是保留为后续连接器方向。
+
 ## 核心用户与任务
 
 | 用户 | 核心任务 | 最重要的产品条件 |
@@ -55,7 +67,14 @@ P0：时钟、月历、倒计时、天气、番茄钟、任务/习惯、进度�
 
 P1：世界时钟、时间进度、计算/换算、财务目标、图表、图片、导航、社交与动态宠物。
 
-P2：黄历、星座、节气、每日卡牌、情绪轨道、虚拟植物、专注花园、决定转盘等差异化内容。
+P2：黄历、星座、节气、每日卡牌、情绪轨道、虚拟植物、专注花园、决定转盘、塔罗、ASCII、调色板等差异化内容。
+
+本轮之后的下一阶段：
+
+1. 为 `news-feed` 增加 RSS / Atom 安全代理与缓存，而不是让每个 Notion iframe 直接请求第三方。
+2. 为 `google-calendar` 增加公开 ICS 解析；私有日历继续走用户自己的公开链接或 OAuth 连接器。
+3. 用独立的 Durable Object 房间实现可选的 Like / Upvote / Guestbook，并加入频率限制。
+4. 通过官方 OAuth 或用户主动发布的只读数据，扩展 TradingView、Stripe、Airtable、Google Sheets 等连接器。
 
 ## 产品原则
 
@@ -73,5 +92,11 @@ P2：黄历、星座、节气、每日卡牌、情绪轨道、虚拟植物、专
 - [Indify](https://indify.co/) — 定制与统一体验定位。
 - [Widgets For Notion: Best Free Notion Widgets in 2026](https://widgetsfornotion.com/blog/best-notion-widgets) — 高频品类、安装路径与风格系列。
 - [Malinkang: Notion 动态图标使用](https://malinkang.com/posts/notion_token/) — 参数化动态 Icon/封面机制。
+- [Plus AI: widgets for Notion](https://plusai.com/notion-widgets) — Google Calendar、Tally、Pomodoro、白板、Spotify、GIF、图表与外部 Snapshot 场景。
+- [Widgetly](https://www.widgetly.co/) — 业务 KPI、时间追踪、页面浏览、按钮、支付、重复任务、AI Bot 与 Notion 日历需求。
+- [Apption](https://apption.co/apps) — 白板、Pinterest/Giphy、Goodreads、Google Analytics、TradingView、CoinGecko、塔罗、祈祷时间、调色板、ASCII 等目录信号。
+- [Indify widget gallery](https://indify.online/widgets) — Habit、Progress、Calendar、QR、Gallery、Color Palette 与 ASCII Art 等常见补位。
+- [Blocky widgets](https://www.blocky.so/widgets) — Bar/Line/Pie/Area/Radar 图表、Flashcards、Mood、Streaks 与外部数据连接方向。
+- [Widgets For Notion](https://widgetsfornotion.com/widgets) — 无账号、主题化、可验证、直接嵌入的目录体验。
 
 说明：平台公开数字会随时间变化；本文件记录的是调研当日公开页面所见，不代表独立审计结果。
