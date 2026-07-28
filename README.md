@@ -13,16 +13,19 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/zengyincen/notion-widget-atelier/actions/workflows/deploy-pages.yml"><img src="https://img.shields.io/github/actions/workflow/status/zengyincen/widget-atelier/deploy-pages.yml?branch=main&amp;style=flat-square&amp;label=Pages" alt="GitHub Pages status" /></a>
+  <a href="https://github.com/zengyincen/notion-widget-atelier/actions/workflows/deploy-pages.yml"><img src="https://img.shields.io/github/actions/workflow/status/zengyincen/notion-widget-atelier/deploy-pages.yml?branch=main&amp;style=flat-square&amp;label=Pages" alt="GitHub Pages status" /></a>
   <a href="https://nwb.imnotfound.eu.org/health"><img src="https://img.shields.io/website?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fhealth&amp;style=flat-square&amp;label=Cloud%20Sync" alt="Cloud sync status" /></a>
-  <a href="https://widget.imnotfound.eu.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fmetrics%2Fbadge%2Fvisitors&amp;style=flat-square" alt="网站访问人数" /></a>
-  <a href="https://widget.imnotfound.eu.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fmetrics%2Fbadge%2Fusers&amp;style=flat-square" alt="组件使用人数" /></a>
-  <a href="./LICENSE"><img src="https://img.shields.io/github/license/zengyincen/widget-atelier?style=flat-square" alt="MIT License" /></a>
-  <a href="https://github.com/zengyincen/notion-widget-atelier/stargazers"><img src="https://img.shields.io/github/stars/zengyincen/widget-atelier?style=flat-square" alt="GitHub Stars" /></a>
-  <a href="https://github.com/zengyincen/notion-widget-atelier/commits/main"><img src="https://img.shields.io/github/last-commit/zengyincen/widget-atelier?style=flat-square" alt="Last commit" /></a>
+  <a href="https://widget.imnotfound.eu.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fmetrics%2Fbadge%2Fvisitors&amp;style=flat-square" alt="Website visitors" /></a>
+  <a href="https://widget.imnotfound.eu.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fmetrics%2Fbadge%2Fusers&amp;style=flat-square" alt="Widget users" /></a>
+  <a href="https://github.com/zengyincen/notion-widget-atelier"><img src="https://komarev.com/ghpvc/?username=zengyincen&amp;repo=notion-widget-atelier&amp;label=README%20views&amp;color=blue&amp;style=flat-square" alt="README views" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/zengyincen/notion-widget-atelier?style=flat-square" alt="MIT License" /></a>
+  <a href="https://github.com/zengyincen/notion-widget-atelier/stargazers"><img src="https://img.shields.io/github/stars/zengyincen/notion-widget-atelier?style=flat-square" alt="GitHub Stars" /></a>
+  <a href="https://github.com/zengyincen/notion-widget-atelier/commits/main"><img src="https://img.shields.io/github/last-commit/zengyincen/notion-widget-atelier?style=flat-square" alt="Last commit" /></a>
 </p>
 
 <p align="center">
+  <a href="./README.en.md">English README</a>
+  ·
   <a href="https://widget.imnotfound.eu.org/"><strong>挑选我的第一个组件</strong></a>
   ·
   <a href="https://widget.imnotfound.eu.org/?category=feature-pet">领养桌面宠物</a>
@@ -159,7 +162,7 @@ Widget Atelier（旧名 Notion Widget Box）是我们为 Notion 用户提供的�
 
 ```bash
 git clone https://github.com/zengyincen/notion-widget-atelier.git
-cd widget-atelier
+cd notion-widget-atelier
 python3 -m http.server 4173
 ```
 

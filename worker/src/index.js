@@ -232,10 +232,11 @@ async function readMetricTotals(request, env) {
 
 function badge(data, kind) {
   const isVisitors = kind === "visitors";
+  const count = Number(data[kind] || 0);
   return Response.json({
     schemaVersion: 1,
-    label: isVisitors ? "网站访问人数" : "组件使用人数",
-    message: `${Number(data[kind] || 0).toLocaleString("zh-CN")} 人`,
+    label: isVisitors ? "Website visitors" : "Widget users",
+    message: `${count.toLocaleString("en-US")} ${count === 1 ? "person" : "people"}`,
     color: isVisitors ? "f38020" : "20201e",
     namedLogo: "cloudflare",
     logoColor: "white",
