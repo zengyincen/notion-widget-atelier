@@ -2,7 +2,7 @@
 
 参考仓库：[ShoroukAziz/notion_widgets](https://github.com/ShoroukAziz/notion_widgets)
 
-| 参考项目类型 | Notion Widget Box 对应引擎 |
+| 参考项目类型 | Widget Atelier 对应引擎 |
 | --- | --- |
 | greetings-date-clock / 多语言问候 | `greeting`、`digital-clock`、`word-clock` |
 | calendar / calendar2 / minimal calendar | `calendar`、`week-calendar` |
@@ -32,7 +32,7 @@
 
 参考仓库：[RylanBot/awesome-notion-widgets](https://github.com/RylanBot/awesome-notion-widgets)（MIT License）
 
-| 参考项目类型 | Notion Widget Box 对应引擎 | 扩展能力 |
+| 参考项目类型 | Widget Atelier 对应引擎 | 扩展能力 |
 | --- | --- | --- |
 | 随机诗句 | `vertical-poem` | 今日诗词 API、自定义内容、主题/分类、竖排方向、诗名/作者、字号、字体与主题 |
 | 英文图片引言 | `scenic-quote` | 每日/自定义引言、自定义背景、遮罩、模糊、三种排版、全部全局样式参数 |
@@ -44,7 +44,7 @@
 
 ## 本轮市场缺口补齐（2026-07-28）
 
-| 市场常见组件 | Notion Widget Box 对应引擎 | 数据 / 交互边界 |
+| 市场常见组件 | Widget Atelier 对应引擎 | 数据 / 交互边界 |
 | --- | --- | --- |
 | Google Calendar / 外部日历 | `google-calendar` | 用户粘贴公开日历 URL；私有 OAuth 连接器留待后续 |
 | Schedule Builder / 周计划 | `schedule-builder` | URL 配置日程，完成状态保存在浏览器 |

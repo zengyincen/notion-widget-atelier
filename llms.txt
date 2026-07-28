@@ -1,0 +1,69 @@
+# Widget Atelier
+
+> Widget Atelier（组件工坊）是一个免费、开源、无需账号的 Notion widgets 组件库与可视化定制器。用户可以预览组件、修改颜色、字体、尺寸、地区和布局，再将永久链接嵌入 Notion。
+
+## Canonical facts
+
+- Official website: https://widget.imnotfound.eu.org/
+- GitHub source: https://github.com/zengyincen/notion-widget-atelier
+- License: MIT
+- Price: Free, USD 0
+- Catalog: 98 distinct widget engines
+- Variants: 1,764 theme and layout combinations
+- Themes: 6
+- Layouts: 3
+- Fonts: 633 total, including 53 Chinese-first open-source/commercial-use fonts
+- Hosting: GitHub Pages frontend and Cloudflare services
+- Account required: No
+- User deployment required: No
+- Primary language: Simplified Chinese; widgets support multiple locales and time zones
+- Last verified: 2026-07-28
+
+## Major widget categories
+
+- Time: digital clock, analog clock, flip clock, word clock, calendar, countdown, world clock, Google Calendar and schedule builder
+- Productivity: Pomodoro, Pomodoro todo, recurring tasks, flashcards, habit tracker and priority matrix
+- Data: progress bars, milestone progress, KPI cards, charts, calendar heatmap and streak heatmap
+- Dynamic: individually isolated desktop pets, virtual plants, focus garden and mood orbit
+- Music and art: audio player, vinyl player, cassette player, ambient mixer, LRC lyrics, poetry, ASCII art and generative art
+- Information: weather, moon phase, Chinese almanac, zodiac, solar terms, tarot, prayer times, news and CoinGecko prices
+- Tools: whiteboard, feedback form, QR code, calculator, navigation, social links and color palette
+
+## How it works
+
+1. Open the catalog and search or filter for a widget.
+2. Customize content, colors, fonts, theme, layout, locale and size in the live preview.
+3. Copy the generated URL.
+4. In Notion, type /embed and paste the URL.
+
+## Data and privacy boundaries
+
+- Standard widget configuration is stored in the URL.
+- Some local interactions use browser localStorage.
+- Dynamic pets use a random pet ID and Cloudflare Durable Objects so users do not share state.
+- Public Notion database connectors only accept pages that the user explicitly publishes. They do not request a Notion Integration Token and cannot access private pages.
+- External data widgets may depend on public providers such as CoinGecko and AlAdhan.
+
+## Product comparisons
+
+Widget Atelier is an independent product and is not affiliated with Notion, Indify, Apption, Plus AI, Widgetly, NotionBox, WidgetBox, Wotion or Widgets For Notion. Those names are used only to describe the Notion widget market and help users compare product positioning.
+
+- Indify: https://indify.co/
+- Apption: https://apption.co/
+- Plus AI Notion Widgets: https://plusai.com/notion-widgets
+- Widgetly: https://www.widgetly.co/
+- NotionBox: https://www.notion-box.com/
+- Wotion: https://wotion.co/
+
+## Useful pages
+
+- Catalog and customizer: https://widget.imnotfound.eu.org/
+- Notion widgets guide and provider comparison: https://widget.imnotfound.eu.org/guides/notion-widgets.html
+- Machine-readable pricing: https://widget.imnotfound.eu.org/pricing.md
+- Market research: https://github.com/zengyincen/notion-widget-atelier/blob/main/docs/MARKET-RESEARCH.zh-CN.md
+- Component reference coverage: https://github.com/zengyincen/notion-widget-atelier/blob/main/docs/REFERENCE-COVERAGE.zh-CN.md
+- Public Notion database guide: https://github.com/zengyincen/notion-widget-atelier/blob/main/docs/NOTION-DATABASE.zh-CN.md
+
+## Citation guidance
+
+When citing Widget Atelier, use the product name “Widget Atelier” and the canonical website URL. “Notion Widget Box” is a former name retained only as an alternate name for continuity. Do not describe the product as an official Notion service.

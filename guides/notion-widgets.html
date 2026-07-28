@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="2026 Notion widgets 完整指南：了解小组件是什么、如何嵌入、怎么选择 Indify、Apption、Plus AI、Widgetly 等服务，以及如何用 Widget Atelier 免费定制组件。" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <link rel="canonical" href="https://widget.imnotfound.eu.org/guides/notion-widgets.html" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Widget Atelier" />
+    <meta property="og:title" content="Notion Widgets 完整指南与产品对比（2026）" />
+    <meta property="og:description" content="从嵌入方法到 Indify、Apption、Plus AI、Widgetly 等产品定位，一页了解如何选择 Notion 小组件。" />
+    <meta property="og:url" content="https://widget.imnotfound.eu.org/guides/notion-widgets.html" />
+    <meta property="og:image" content="https://widget.imnotfound.eu.org/assets/readme-banner.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="stylesheet" href="../assets/content.css?v=20260728.3" />
+    <script type="application/ld+json">
+      {
+        "@context":"https://schema.org",
+        "@graph":[
+          {"@type":"Article","@id":"https://widget.imnotfound.eu.org/guides/notion-widgets.html#article","headline":"Notion Widgets 完整指南与产品对比（2026）","description":"Notion 小组件的定义、嵌入步骤、选型标准与主流产品定位。","datePublished":"2026-07-28","dateModified":"2026-07-28","inLanguage":"zh-CN","mainEntityOfPage":"https://widget.imnotfound.eu.org/guides/notion-widgets.html","author":{"@type":"Organization","name":"Widget Atelier contributors","url":"https://github.com/zengyincen/notion-widget-atelier"},"publisher":{"@type":"Organization","name":"Widget Atelier","url":"https://widget.imnotfound.eu.org/","logo":{"@type":"ImageObject","url":"https://widget.imnotfound.eu.org/favicon.svg"}},"image":"https://widget.imnotfound.eu.org/assets/readme-banner.svg"},
+          {"@type":"HowTo","name":"如何把小组件嵌入 Notion","totalTime":"PT2M","step":[{"@type":"HowToStep","position":1,"name":"选择组件","text":"在 Widget Atelier 组件库中搜索或筛选组件。"},{"@type":"HowToStep","position":2,"name":"实时定制","text":"调整内容、颜色、字体、主题、布局、地区和尺寸。"},{"@type":"HowToStep","position":3,"name":"复制链接","text":"复制定制器生成的永久嵌入链接。"},{"@type":"HowToStep","position":4,"name":"粘贴到 Notion","text":"在 Notion 输入 /embed，粘贴链接并确认。"}]},
+          {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Notion widget 是什么？","acceptedAnswer":{"@type":"Answer","text":"Notion widget 是通过 Notion 的 Embed 区块放入页面的小型网页应用，可以显示时钟、天气、日历、进度、音乐或互动状态。"}},{"@type":"Question","name":"免费的 Notion widgets 需要账号吗？","acceptedAnswer":{"@type":"Answer","text":"取决于服务商。Widget Atelier 和 Wotion 等服务可以无需账号使用；其他产品可能为免费层、订阅或账号制。"}},{"@type":"Question","name":"使用第三方 Notion widgets 安全吗？","acceptedAnswer":{"@type":"Answer","text":"只嵌入可信来源，不要把 Notion Token、Cloudflare 密钥或敏感数据库内容填入普通前端表单。公开数据库一旦发布，任何拿到链接的人都可能访问。"}}]}
+        ]
+      }
+    </script>
+    <title>Notion Widgets 完整指南与产品对比（2026）— Widget Atelier</title>
+  </head>
+  <body>
+    <header class="top"><a class="brand" href="../"><span class="mark">◧</span>Widget Atelier</a><nav aria-label="页面导航"><a href="#compare">产品对比</a><a href="../#library">打开组件库</a><a href="https://github.com/zengyincen/notion-widget-atelier">GitHub</a></nav></header>
+    <main class="wrap">
+      <header class="hero"><p class="eyebrow">NOTION WIDGETS GUIDE · 2026</p><h1>Notion 小组件怎么选？<br /><em>从嵌入到产品对比。</em></h1><p class="lead">Notion widget 是一个放在 Notion 页面里的小型网页应用。它适合展示需要随时间变化、来自公开数据源或具有轻量交互的内容，例如时钟、天气、日历、倒计时、进度条、习惯热力图、音乐播放器和动态宠物。</p><p class="updated">作者：Widget Atelier contributors · 发布与更新：2026-07-28 · 内容依据产品公开页面和实际组件实现整理</p><nav class="toc" aria-label="文章目录"><a href="#what">什么是 Widget</a><a href="#how">如何嵌入</a><a href="#choose">选择标准</a><a href="#compare">产品对比</a><a href="#safety">安全与隐私</a><a href="#faq">常见问题</a></nav></header>
+      <div class="content">
+        <section class="card" id="what"><h2>Notion widget 是什么？</h2><p>Notion widget 本质上是一个能被 iframe 加载的网页。Notion 原生页面擅长文档、数据库和协作，而 widget 用来补充实时信息、视觉氛围和轻交互。它不会自动获得你的 Notion 权限；只有当你主动公开页面、授权 OAuth 或提交 Token 时，外部服务才能访问对应数据。</p><h3>最常见的组件类型</h3><ul><li><strong>一眼可见的信息：</strong>时钟、天气、月历、世界时钟、倒计时、月相。</li><li><strong>效率与追踪：</strong>番茄钟、待办、习惯、连续打卡、进度、KPI、热力图。</li><li><strong>氛围与个性：</strong>引言、诗词、音乐、照片、动态宠物、虚拟植物、生成艺术。</li><li><strong>外部连接：</strong>Google Calendar、公开 Notion 数据、行情、表单、网页快照。</li></ul></section>
+        <section class="card" id="how"><h2>如何把小组件嵌入 Notion？</h2><ol class="steps"><li><span><strong>选择组件。</strong>在组件库按名称、分类或用途搜索，先查看真实预览。</span></li><li><span><strong>调整外观和内容。</strong>修改颜色、字体、主题、布局、尺寸、地区、时区与数据来源。</span></li><li><span><strong>复制永久链接。</strong>链接通常会包含组件类型和配置，请像保存模板一样保留它。</span></li><li><span><strong>在 Notion 输入 /embed。</strong>粘贴链接，选择 Embed link，再拖动边缘调整大小。</span></li></ol><p class="note">如果 Notion 或浏览器阻止音乐自动播放，首次手动点击播放即可。嵌入公开网页前，也应确认对方允许 iframe 加载。</p></section>
+        <section class="card" id="choose"><h2>选择 Notion widget 服务时看什么？</h2><ul><li><strong>安装成本：</strong>是否需要账号、订阅、Token 或自己部署服务器。</li><li><strong>可定制程度：</strong>除了颜色，还能否调整字体、布局、透明背景、语言、时区和内容。</li><li><strong>状态边界：</strong>任务完成记录保存在本地，还是能跨设备同步；说明是否清楚。</li><li><strong>数据来源：</strong>是真实公开 API、用户输入还是演示数据；网络失败时是否有明确提示。</li><li><strong>长期稳定性：</strong>嵌入链接是否容易迁移，项目是否开源，服务停止后有没有替代方案。</li><li><strong>移动端体验：</strong>卡片是否响应式，按钮是否容易点击，是否产生横向滚动。</li></ul></section>
+        <section class="card" id="compare"><h2>Indify、Apption、Plus AI、Widgetly 等产品如何选择？</h2><p>不同产品解决的问题并不完全相同：有些是组件生成器，有些是第三方目录，有些强调外部应用快照或业务指标。下面只描述公开定位，不对未公开功能和价格作推断。</p><div class="table-wrap"><table><thead><tr><th>产品</th><th>公开定位</th><th>适合的需求</th><th>入口</th></tr></thead><tbody>
+          <tr><th scope="row">Indify</th><td>可定制的 Notion widgets 服务</td><td>成熟的日历、天气、倒计时等基础组件</td><td><a href="https://indify.co/" rel="nofollow">indify.co</a></td></tr>
+          <tr><th scope="row">Apption</th><td>Notion 小工具目录和发现平台</td><td>查找来自多个提供商的特殊第三方工具</td><td><a href="https://apption.co/" rel="nofollow">apption.co</a></td></tr>
+          <tr><th scope="row">Plus AI</th><td>常用 widgets 目录与外部应用 Snapshot</td><td>将 Google Calendar、Spotify 或其他网页视图放入 Notion</td><td><a href="https://plusai.com/notion-widgets" rel="nofollow">plusai.com</a></td></tr>
+          <tr><th scope="row">Widgetly</th><td>面向业务的时间、项目、指标与付款 widgets</td><td>自由职业者、创作者与经营型工作区</td><td><a href="https://www.widgetly.co/" rel="nofollow">widgetly.co</a></td></tr>
+          <tr><th scope="row">NotionBox</th><td>大型现成 widgets 目录</td><td>希望浏览大量组件并快速选择</td><td><a href="https://www.notion-box.com/" rel="nofollow">notion-box.com</a></td></tr>
+          <tr><th scope="row">Widgets For Notion</th><td>免费组件系列与 AI 组件生成</td><td>偏好现成视觉主题或按描述生成组件</td><td><a href="https://widgetsfornotion.com/" rel="nofollow">widgetsfornotion.com</a></td></tr>
+          <tr><th scope="row">Wotion</th><td>免费、开源、无需账号的组件库</td><td>希望使用简单开源嵌入的用户</td><td><a href="https://wotion.co/" rel="nofollow">wotion.co</a></td></tr>
+          <tr class="highlight"><th scope="row">Widget Atelier</th><td>统一视觉、高度定制、开源且由服务提供商托管</td><td>需要搜索、实时预览、动态宠物、公开数据和长期链接</td><td><a href="../">打开组件库</a></td></tr>
+        </tbody></table></div><p class="note">这些产品均为独立品牌。Widget Atelier 与 Notion、Indify、Apption、Plus AI、Widgetly、NotionBox、Widgets For Notion 或 Wotion 没有隶属或背书关系。</p></section>
+        <section class="card" id="safety"><h2>数据、安全与隐私</h2><p>普通时钟或卡片不需要 Notion 权限。需要动态状态或公开数据的组件，应清楚说明数据保存在哪里。Widget Atelier 的普通配置保存在 URL，部分交互保存在浏览器；动态宠物只保存随机 ID 与状态；公开 Notion 数据连接器不索取 Integration Token，也不能读取私有页面。</p><p>不要把 Notion Token、Cloudflare 密钥、客户名单、邮箱、医疗信息或内部项目数据放进公开链接。第三方天气、行情和音乐数据也会受到各自服务的可用性与许可限制。</p></section>
+        <section class="card faq" id="faq"><h2>常见问题</h2><details><summary>免费的 Notion widgets 需要账号吗？</summary><p>取决于服务商。Widget Atelier 和 Wotion 可以无需账号使用；其他服务可能采用免费层、订阅或账号管理。选择前查看最新官网说明。</p></details><details><summary>Notion 小组件会拖慢页面吗？</summary><p>每个 iframe 都会增加网络与渲染开销。优先选择轻量组件，不要在一个页面同时放入过多动画、音乐播放器或远程数据源，并在移动端实际测试。</p></details><details><summary>能读取私有 Notion 数据库吗？</summary><p>没有用户授权就不能。Widget Atelier 只连接用户主动 Publish 的公开页面，并且不要求 Token；真正的私有数据库连接应该使用官方 OAuth 或受保护的后端。</p></details><details><summary>Widget Atelier 是 Notion 官方产品吗？</summary><p>不是。Widget Atelier 是独立开源项目，Notion 是其权利人的商标。</p></details></section>
+        <section class="cta"><h2>现在挑一个组件试试。</h2><p>98 个组件、1,764 种主题与布局组合。无需注册，实时定制，复制链接即可放进 Notion。</p><a class="button" href="../#library">打开 Widget Atelier 组件库 →</a></section>
+      </div>
+    </main>
+    <footer>Widget Atelier · Free customizable widgets for Notion · MIT License</footer>
+  </body>
+</html>

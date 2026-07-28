@@ -3,23 +3,85 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="98 个可高度自定义的 Notion 小组件：实时预览、自由改色与字体，复制永久链接即可嵌入，动态宠物和公开数据由我们云端同步。" />
+    <meta name="description" content="Widget Atelier 是免费的 Notion widgets 组件库：98 个可高度自定义的小组件，支持时钟、日历、进度条、热力图、宠物、音乐与公开数据，实时预览后复制链接即可嵌入 Notion。" />
+    <meta name="keywords" content="Notion widgets, Notion 小组件, Notion embed, free Notion widgets, Notion widget generator, Notion progress bar, Notion calendar, Notion pet widget" />
+    <meta name="author" content="Widget Atelier contributors" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="theme-color" content="#f3f2ee" />
     <link rel="canonical" href="https://widget.imnotfound.eu.org/" />
     <meta property="og:url" content="https://widget.imnotfound.eu.org/" />
-    <title>Notion Widget Box — 1760+ 小组件组合</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Widget Atelier" />
+    <meta property="og:title" content="Widget Atelier — 免费 Notion Widgets 组件库" />
+    <meta property="og:description" content="挑选、定制并嵌入 Notion 小组件。98 个组件、1,764 种主题与布局组合，无需账号。" />
+    <meta property="og:image" content="https://widget.imnotfound.eu.org/assets/readme-banner.svg" />
+    <meta property="og:image:alt" content="Widget Atelier Notion widgets 组件库" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Widget Atelier — 免费 Notion Widgets 组件库" />
+    <meta name="twitter:description" content="98 个可定制 Notion widgets，复制链接即可嵌入。" />
+    <meta name="twitter:image" content="https://widget.imnotfound.eu.org/assets/readme-banner.svg" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="Widget Atelier for AI agents" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://widget.imnotfound.eu.org/#organization",
+            "name": "Widget Atelier",
+            "alternateName": ["Notion Widget Box", "组件工坊"],
+            "url": "https://widget.imnotfound.eu.org/",
+            "logo": "https://widget.imnotfound.eu.org/favicon.svg",
+            "sameAs": ["https://github.com/zengyincen/notion-widget-atelier"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://widget.imnotfound.eu.org/#website",
+            "name": "Widget Atelier",
+            "alternateName": "Free Notion Widgets",
+            "url": "https://widget.imnotfound.eu.org/",
+            "publisher": {"@id": "https://widget.imnotfound.eu.org/#organization"},
+            "inLanguage": ["zh-CN", "en"]
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://widget.imnotfound.eu.org/#application",
+            "name": "Widget Atelier Notion Widgets",
+            "applicationCategory": "ProductivityApplication",
+            "operatingSystem": "Web",
+            "url": "https://widget.imnotfound.eu.org/",
+            "description": "A free, customizable library of embeddable widgets for Notion pages.",
+            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"},
+            "featureList": ["98 widget engines", "1,764 theme and layout combinations", "Notion embed links", "Cloudflare Durable Object pet sync", "Public Notion data connectors"]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://widget.imnotfound.eu.org/#faq",
+            "mainEntity": [
+              {"@type": "Question", "name": "Widget Atelier 是什么？", "acceptedAnswer": {"@type": "Answer", "text": "Widget Atelier 是一个免费的 Notion widgets 组件库。用户可以搜索、预览和定制时钟、日历、进度条、热力图、宠物、音乐等组件，再把永久链接粘贴到 Notion 的 /embed 块中。"}},
+              {"@type": "Question", "name": "需要注册或部署服务器吗？", "acceptedAnswer": {"@type": "Answer", "text": "不需要注册，也不需要部署服务器。组件由 GitHub Pages 和 Cloudflare 托管，普通组件的配置会写入嵌入链接。"}},
+              {"@type": "Question", "name": "可以连接 Notion 数据库吗？", "acceptedAnswer": {"@type": "Answer", "text": "可以。将 Notion 页面主动 Publish 为公开页面后，Widget Atelier 可以读取列结构并生成进度条或热力图数据链接；不需要 Integration Token，也不能读取私有页面。"}},
+              {"@type": "Question", "name": "Widget Atelier 与 Indify、Apption、Plus AI、Widgetly 有什么不同？", "acceptedAnswer": {"@type": "Answer", "text": "Indify、Apption、Plus AI 和 Widgetly 都是 Notion widget 领域的产品或目录。Widget Atelier 侧重开源、无需账号、统一视觉、多主题和可复制的静态链接，同时提供 Cloudflare 托管的动态宠物和公开数据连接器。"}}
+            ]
+          }
+        ]
+      }
+    </script>
+    <title>Widget Atelier — 免费 Notion Widgets 组件库</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=20260728.2" />
-    <script src="assets/service.js?v=20260728.2" defer></script>
-    <script src="assets/catalog.js?v=20260728.2" defer></script>
-    <script src="assets/fonts.js?v=20260728.2" defer></script>
-    <script src="assets/app.js?v=20260728.2" defer></script>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="stylesheet" href="assets/styles.css?v=20260728.3" />
+    <script src="assets/service.js?v=20260728.3" defer></script>
+    <script src="assets/catalog.js?v=20260728.3" defer></script>
+    <script src="assets/fonts.js?v=20260728.3" defer></script>
+    <script src="assets/app.js?v=20260728.3" defer></script>
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="./" aria-label="Notion Widget Box 首页">
+      <a class="brand" href="./" aria-label="Widget Atelier 首页">
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span>Notion Widget Box</span>
+        <span>Widget Atelier</span>
       </a>
       <form class="global-search" id="searchForm" role="search">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.4A7.75 7.75 0 1 1 3.5 11.25a7.75 7.75 0 0 1 15.5 0Z"/></svg>
@@ -29,7 +91,7 @@
       </form>
       <nav class="top-actions" aria-label="页面导航">
         <a href="#library">组件库</a>
-        <a class="github-button" href="https://github.com/zengyincen/notion-widget-box" target="_blank" rel="noreferrer" aria-label="GitHub">
+        <a class="github-button" href="https://github.com/zengyincen/notion-widget-atelier" target="_blank" rel="noreferrer" aria-label="GitHub">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 2a8 8 0 0 1 2.5 15.6v-2c0-.8-.3-1.4-.7-1.8 2.4-.3 4.9-1.2 4.9-5.3 0-1.2-.4-2.1-1.1-2.9.1-.3.5-1.4-.1-2.8 0 0-.9-.3-3 1.1A10 10 0 0 0 12 5.6a10 10 0 0 0-2.5.3c-2.1-1.4-3-1.1-3-1.1-.6 1.4-.2 2.5-.1 2.8-.7.8-1.1 1.7-1.1 2.9 0 4.1 2.5 5 4.9 5.3-.3.3-.6.8-.7 1.4-.8.4-2.8 1-4-1.1-.2-.4-.8-1.3-1.7-1.3A8 8 0 0 1 12 4Z"/></svg>
         </a>
       </nav>
@@ -91,6 +153,28 @@
           <button class="load-more" id="loadMore" type="button">加载更多 <span id="remainingCount"></span></button>
         </div>
       </section>
+      <section class="seo-content" aria-labelledby="seo-title">
+        <div class="seo-intro">
+          <p class="eyebrow">NOTION WIDGETS · FREE EMBEDS</p>
+          <h2 id="seo-title">免费的 Notion 小组件，<br /><em>为你的工作区加一层个性。</em></h2>
+          <p>Widget Atelier（组件工坊）是一个面向 Notion 用户的在线 widgets 目录和定制器。它把时钟、日历、倒计时、进度条、习惯热力图、音乐播放器、动态宠物和公开数据卡片放在同一个可搜索的组件库里。选好组件、实时调整样式，再将链接粘贴到 Notion 的 <code>/embed</code> 块即可。</p>
+          <p class="seo-updated">内容与组件目录最后更新：2026-07-28 · <a href="https://github.com/zengyincen/notion-widget-atelier/commits/main">查看 GitHub 更新</a></p>
+        </div>
+        <div class="seo-columns">
+          <article><h3>适合哪些 Notion 页面？</h3><ul><li>学生与知识工作者：番茄钟、任务、日历、进度和 KPI。</li><li>生活记录与手帐：宠物、月相、天气、黄历、星座和每日卡牌。</li><li>创作者与团队：公开数据库、反馈表单、按钮、音乐和品牌配色。</li></ul></article>
+          <article><h3>为什么选择 Widget Atelier？</h3><ul><li>98 个组件引擎，主页不重复展示卡片。</li><li>6 套主题、3 种布局、1,764 种组合，颜色、字体、尺寸、地区均可改。</li><li>免费、无需账号、无需部署，链接适合长期嵌入 Notion。</li></ul></article>
+        </div>
+        <div class="seo-comparison"><h3>Notion widget 产品怎么选？</h3><p>下面的对照帮助你快速理解不同产品的定位。Widget Atelier 不隶属于这些品牌，也不代表它们的官方立场。</p><div class="seo-table-wrap"><table><thead><tr><th>产品</th><th>公开定位</th><th>更适合</th></tr></thead><tbody>
+          <tr><th scope="row"><a href="https://indify.co/" rel="nofollow">Indify</a></th><td>定制化 Notion widgets 服务</td><td>需要成熟的基础组件与账号管理</td></tr>
+          <tr><th scope="row"><a href="https://apption.co/" rel="nofollow">Apption</a></th><td>外部小工具目录与发现平台</td><td>寻找特殊的第三方工具和连接</td></tr>
+          <tr><th scope="row"><a href="https://plusai.com/notion-widgets" rel="nofollow">Plus AI</a></th><td>把应用快照和常用 widgets 带进 Notion</td><td>需要 Google Calendar、Spotify 或外部应用视图</td></tr>
+          <tr><th scope="row"><a href="https://www.widgetly.co/" rel="nofollow">Widgetly</a></th><td>面向业务的时间、项目与指标 widgets</td><td>自由职业者和网站经营者的业务数据</td></tr>
+          <tr><th scope="row"><a href="https://www.notion-box.com/" rel="nofollow">NotionBox</a></th><td>200+ widgets 的商业目录</td><td>希望快速浏览大量现成组件</td></tr>
+          <tr><th scope="row"><a href="https://wotion.co/" rel="nofollow">Wotion</a></th><td>免费、开源、无需账号的 Notion widgets</td><td>偏好简单开源嵌入的用户</td></tr>
+          <tr class="seo-highlight"><th scope="row">Widget Atelier</th><td>开源、统一视觉、高度定制的 Notion widgets 组件工坊</td><td>想要免费、无账号、可搜索且可长期维护的完整组件库</td></tr>
+        </tbody></table></div><p class="seo-source">产品定位依据各站点公开页面整理，价格、目录数量和功能会随时间变化；请以各产品官网为准。阅读 <a href="guides/notion-widgets.html">Notion widgets 完整指南</a>，或查看 <a href="docs/MARKET-RESEARCH.zh-CN.md">市场研究</a> 与 <a href="docs/REFERENCE-COVERAGE.zh-CN.md">参考项目覆盖说明</a>。</p></div>
+        <div class="seo-faq"><h3>常见问题</h3><details><summary>如何把小组件放进 Notion？</summary><p>在 Widget Atelier 选择组件并完成定制，点击“复制链接”，然后在 Notion 输入 <code>/embed</code>，粘贴链接并确认。组件会根据容器尺寸自适应。</p></details><details><summary>公开 Notion 数据安全吗？</summary><p>连接器只接受你主动发布的公开页面，不读取私有页面，也不要求 Integration Token。公开页面内容可能被任何拿到链接的人访问，请勿放入敏感信息。</p></details><details><summary>动态宠物会和其他用户撞车吗？</summary><p>不会。每次领养会生成独立随机 ID，并通过 Cloudflare Durable Objects 保存自己的状态；宠物名字可以相同，但数据不会混在一起。</p></details></div>
+      </section>
     </main>
 
     <dialog class="customizer" id="customizer">
@@ -141,7 +225,7 @@
       </form>
     </dialog>
 
-    <footer><div><a class="brand" href="./"><span class="brand-mark"><i></i><i></i><i></i></span><span>Notion Widget Box</span></a><p>选好、定制、复制，三步完成。</p></div><div><strong data-total-components>98</strong><span>组件引擎</span></div><div><strong><span data-total-variants>1,764</span>+</strong><span>可定制组合</span></div><div><strong>1</strong><span>托管云服务</span></div></footer>
+    <footer><div><a class="brand" href="./"><span class="brand-mark"><i></i><i></i><i></i></span><span>Widget Atelier</span></a><p>选好、定制、复制，三步完成。</p></div><div><strong data-total-components>98</strong><span>组件引擎</span></div><div><strong><span data-total-variants>1,764</span>+</strong><span>可定制组合</span></div><div><strong>1</strong><span>托管云服务</span></div></footer>
     <div class="toast" id="toast" role="status" aria-live="polite">已复制到剪贴板</div>
   </body>
 </html>

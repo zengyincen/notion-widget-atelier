@@ -1,4 +1,4 @@
-# Notion Widget Box 托管服务运维说明
+# Widget Atelier 托管服务运维说明
 
 > 本文档面向服务管理员。终端用户无需部署 Worker、填写服务地址或接触任何密钥。
 

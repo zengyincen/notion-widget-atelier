@@ -1,10 +1,10 @@
 <p align="center">
   <a href="https://widget.imnotfound.eu.org/">
-    <img src="./favicon.svg" width="88" height="88" alt="Notion Widget Box icon" />
+    <img src="./favicon.svg" width="88" height="88" alt="Widget Atelier icon" />
   </a>
 </p>
 
-<h1 align="center">Notion Widget Box</h1>
+<h1 align="center">Widget Atelier</h1>
 
 <p align="center">
   把你的 Notion，变成真正属于你的空间。
@@ -13,13 +13,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/zengyincen/notion-widget-box/actions/workflows/deploy-pages.yml"><img src="https://img.shields.io/github/actions/workflow/status/zengyincen/notion-widget-box/deploy-pages.yml?branch=main&amp;style=flat-square&amp;label=Pages" alt="GitHub Pages status" /></a>
+  <a href="https://github.com/zengyincen/notion-widget-atelier/actions/workflows/deploy-pages.yml"><img src="https://img.shields.io/github/actions/workflow/status/zengyincen/widget-atelier/deploy-pages.yml?branch=main&amp;style=flat-square&amp;label=Pages" alt="GitHub Pages status" /></a>
   <a href="https://nwb.imnotfound.eu.org/health"><img src="https://img.shields.io/website?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fhealth&amp;style=flat-square&amp;label=Cloud%20Sync" alt="Cloud sync status" /></a>
   <a href="https://widget.imnotfound.eu.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fmetrics%2Fbadge%2Fvisitors&amp;style=flat-square" alt="网站访问人数" /></a>
   <a href="https://widget.imnotfound.eu.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnwb.imnotfound.eu.org%2Fmetrics%2Fbadge%2Fusers&amp;style=flat-square" alt="组件使用人数" /></a>
-  <a href="./LICENSE"><img src="https://img.shields.io/github/license/zengyincen/notion-widget-box?style=flat-square" alt="MIT License" /></a>
-  <a href="https://github.com/zengyincen/notion-widget-box/stargazers"><img src="https://img.shields.io/github/stars/zengyincen/notion-widget-box?style=flat-square" alt="GitHub Stars" /></a>
-  <a href="https://github.com/zengyincen/notion-widget-box/commits/main"><img src="https://img.shields.io/github/last-commit/zengyincen/notion-widget-box?style=flat-square" alt="Last commit" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/zengyincen/widget-atelier?style=flat-square" alt="MIT License" /></a>
+  <a href="https://github.com/zengyincen/notion-widget-atelier/stargazers"><img src="https://img.shields.io/github/stars/zengyincen/widget-atelier?style=flat-square" alt="GitHub Stars" /></a>
+  <a href="https://github.com/zengyincen/notion-widget-atelier/commits/main"><img src="https://img.shields.io/github/last-commit/zengyincen/widget-atelier?style=flat-square" alt="Last commit" /></a>
 </p>
 
 <p align="center">
@@ -32,13 +32,15 @@
 
 <p align="center">
   <a href="https://widget.imnotfound.eu.org/">
-    <img src="./assets/readme-banner.svg" width="100%" alt="Notion Widget Box hero banner" />
+    <img src="./assets/readme-banner.svg" width="100%" alt="Widget Atelier hero banner" />
   </a>
 </p>
 
 ## 你可以用它做什么
 
-Notion Widget Box 是我们为 Notion 用户提供的在线小组件服务。你无需下载代码、申请服务器或配置密钥，打开组件库就能直接使用。
+Widget Atelier（旧名 Notion Widget Box）是我们为 Notion 用户提供的在线小组件服务。你无需下载代码、申请服务器或配置密钥，打开组件库就能直接使用。
+
+> **SEO / AI 搜索入口：** [Notion widgets 完整指南](https://widget.imnotfound.eu.org/guides/notion-widgets.html) 汇总了嵌入方法、选型标准，以及 Indify、Apption、Plus AI、Widgetly、NotionBox、Widgets For Notion 和 Wotion 的公开定位对照。
 
 | | 你会得到 | 使用体验 |
 | --- | --- | --- |
@@ -156,8 +158,8 @@ Notion Widget Box 是我们为 Notion 用户提供的在线小组件服务。你
 ### 本地运行
 
 ```bash
-git clone https://github.com/zengyincen/notion-widget-box.git
-cd notion-widget-box
+git clone https://github.com/zengyincen/notion-widget-atelier.git
+cd widget-atelier
 python3 -m http.server 4173
 ```
 
@@ -196,5 +198,5 @@ python3 -m http.server 4173
 ---
 
 <p align="center">
-  喜欢这个组件盒子？欢迎点一个 ⭐，也欢迎告诉我们你还想看到什么。
+  喜欢这个组件工坊？欢迎点一个 ⭐，也欢迎告诉我们你还想看到什么。
 </p>

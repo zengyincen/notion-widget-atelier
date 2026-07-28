@@ -391,7 +391,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === "/" || url.pathname === "/health") {
       if (request.method !== "GET") return json({ error: "GET required" }, 405);
-      return json({ ok: true, service: "Notion Widget Box Cloud", storage: "Durable Objects", version: 2 });
+      return json({ ok: true, service: "Widget Atelier Cloud", storage: "Durable Objects", version: 2 });
     }
     if (url.pathname === "/metrics/track") {
       if (request.method !== "POST") return json({ error: "POST required" }, 405);
